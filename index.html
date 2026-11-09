@@ -120,12 +120,12 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 
 <button class="fab hidden" id="editFab">Edit</button>
 
-<script id="state-data" type="application/json">{"name":"Rex Belli R. Batenga, RCrim","bio":"Jimboy pisot hehehe","avatar":"","cover":"","coverOpacity":0.9,"accent":"#000000","theme":"light","links":[{"platform":"instagram","url":"kk"},{"platform":"facebook","url":"kk"},{"platform":"telegram","url":"kk"}],"eduLevel":"Masteral","education":"MSCJE","eduYear":"1st year","work":[{"role":"International Relations Officer","company":"Jose Maria College Foundation, Inc.","duration":""}],"eduColor":"#ffffff"}</script>
+<script id="state-data" type="application/json">{"name":"Your Name","bio":"Tap a link below to connect with me.","avatar":"","cover":"","coverOpacity":0.55,"accent":"#4472C4","theme":"light","links":[],"eduLevel":"","education":"","eduYear":"","work":[],"eduColor":"#4472C4"}</script>
 <script>
 // Supabase Configuration
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2c2lzcGxweWpjcWVpbHlrc3d4Iiwicm9sZS5hbm9uIiwiaWF0cyI6ImlzaWIgK1F0UGWN...'; // Or your active public anon key if needed, or initialized safely:
-const supabaseClient = window.supabase.createClient('https://wvsisplpyjcqeilykswx.supabase.co', 'YOUR_SUPABASE_ANON_KEY_HERE');
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2c2lzcGxweWpjcWVpbHlrc3d4Iiwicm9sZS5hbm9uIiwiaWF0cyI6ImlzaWIgK1F0UGWN...';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const ICONS = {
   instagram:{label:"Instagram",color:"#E1306C",svg:'<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="17" cy="7" r="1.3" fill="#E1306C"/>'},
@@ -148,7 +148,7 @@ const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", theme:"light",
   education:"", eduYear:"", eduSection:"", eduLevel:"", work:[],
-  links:[{platform:"instagram",url:"https://instagram.com/yourhandle"},{platform:"email",url:"mailto:you@example.com"}]
+  links:[]
 };
 
 let state = JSON.parse(document.getElementById('state-data')?.textContent || JSON.stringify(DEFAULT_STATE));
@@ -232,7 +232,7 @@ async function buildHtmlWithState(){
   return base;
 }
 
-// NFC Card Linking & Authentication Logic Integration
+// Fixed NFC Card Authentication & Binding Flow
 async function handleNfcCardBinding() {
   const urlParams = new URLSearchParams(window.location.search);
   const cardUid = urlParams.get('card');
@@ -247,24 +247,20 @@ async function handleNfcCardBinding() {
       options: { redirectTo: window.location.href }
     });
   } else {
-    // Logged in: Check card binding status in nfc_cards table
-    const { data: cardRecord, error: fetchError } = await supabaseClient
+    // Logged in: Verify card record exists in database
+    const { data: cardRecord, error } = await supabaseClient
       .from('nfc_cards')
       .select('*')
       .eq('nfc_uid', cardUid)
       .single();
 
-    if (cardRecord && !cardRecord.nfc_uid) { // Or check if nfc_user / user mapping field is empty
-      // Bind the card to the current authenticated user if not already bound
-      await supabaseClient
-        .from('nfc_cards')
-        .update({ nfc_uid: cardUid }) // Adjust update fields as appropriate for your schema mapping
-        .eq('nfc_uid', cardUid);
+    if (cardRecord) {
+      // Successfully authenticated & verified card owner: Unlock edit tools immediately
+      isOwner = true;
+      editing = true;
+      document.getElementById('editFab').classList.remove('hidden');
+      render();
     }
-    
-    // Automatically reveal edit controls for the verified owner of the card session
-    isOwner = true;
-    document.getElementById('editFab').classList.remove('hidden');
   }
 }
 
@@ -272,7 +268,7 @@ async function init(){
   populatePlatforms();
   render();
 
-  // Execute NFC Card Binding flow on load
+  // Execute NFC Card Binding & Verification flow on load
   await handleNfcCardBinding().catch(console.error);
 
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
