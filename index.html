@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title> LYNQ </title>
+<title>LYNQ</title>
 <!-- Include Supabase JS Client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -63,8 +63,8 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
 .note{font-size:12px;color:var(--sub);margin-top:4px;}
 .hidden{display:none !important;}
-.status{font-size:12px;color:var(--sub);text-align:center;margin-top:10px;}
-.auth-prompt{font-size:13px;color:var(--sub);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;}
+.status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
+.auth-prompt{font-size:13px;color:var(--accent);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;display:block;}
 </style>
 </head>
 <body>
@@ -78,7 +78,8 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
     <div class="links" id="linksEl"></div>
-    <div class="auth-prompt hidden" id="authPromptBtn">Already own a card already? Sign in...</div>
+    <div class="status" id="globalErrorEl"></div>
+    <a class="auth-prompt hidden" id="authPromptBtn">Already own this card? Sign in...</a>
   </div>
 
   <div class="panel hidden" id="editPanel">
@@ -116,13 +117,12 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
       <button class="btn" id="saveBtn">Save &amp; Publish</button>
       <button class="btn secondary" id="doneBtn">Done editing</button>
     </div>
-    <div class="status" id="statusEl"></div>
+    <div class="status" id="statusEl" style="color:var(--sub)"></div>
   </div>
 </div>
 
 <button class="fab hidden" id="editFab">Edit</button>
 
-<script id="state-data" type="application/json">{"name":"Your Name","bio":"Tap a link below to connect with me.","avatar":"","cover":"","coverOpacity":0.55,"accent":"#4472C4","theme":"light","links":[],"eduLevel":"","education":"","eduYear":"","work":[],"eduColor":"#4472C4"}</script>
 <script>
 // Supabase Configuration
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
@@ -153,8 +153,12 @@ const DEFAULT_STATE = {
   links:[]
 };
 
-let state = JSON.parse(document.getElementById('state-data')?.textContent || JSON.stringify(DEFAULT_STATE));
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let editing = false, isOwner = false, currentCardUid = null;
+
+function showError(msg) {
+  document.getElementById('globalErrorEl').textContent = msg;
+}
 
 function linkHref(platform, url){
   if(platform==="email" && !url.startsWith("mailto:")) return "mailto:"+url;
@@ -222,47 +226,15 @@ function toDataUrl(file, cb){
   r.readAsDataURL(file);
 }
 
-async function loadCardData(cardUid) {
-  const { data: cardRecord, error } = await supabaseClient
-    .from('nfc_cards')
-    .select('*')
-    .eq('nfc_uid', cardUid)
-    .single();
-
-  if (cardRecord) {
-    if (cardRecord.bio) {
-      try {
-        const parsed = JSON.parse(cardRecord.bio);
-        if (parsed && typeof parsed === 'object') {
-          state = { ...DEFAULT_STATE, ...parsed };
-        }
-      } catch (_e) {
-        state.bio = cardRecord.bio;
-        if (cardRecord.card_title) state.name = cardRecord.card_title;
-      }
-    }
-  }
-}
-
-async function saveCardData() {
-  if (!currentCardUid) return;
-  const profileJsonString = JSON.stringify(state);
-  
-  const { error } = await supabaseClient
-    .from('nfc_cards')
-    .update({ 
-      bio: profileJsonString,
-      card_title: state.name 
-    })
-    .eq('nfc_uid', currentCardUid);
-
-  if (error) throw error;
-}
-
 async function handleNfcCardBinding() {
   const urlParams = new URLSearchParams(window.location.search);
   const cardUid = urlParams.get('card');
-  if (!cardUid) return;
+  
+  if (!cardUid) {
+    showError("Missing ?card= parameter in URL.");
+    render();
+    return;
+  }
   currentCardUid = cardUid;
 
   const { data: cardRecord, error } = await supabaseClient
@@ -271,9 +243,29 @@ async function handleNfcCardBinding() {
     .eq('nfc_uid', cardUid)
     .single();
 
-  if (!cardRecord) return;
+  if (error) {
+    showError("Database error: " + error.message);
+    render();
+    return;
+  }
 
-  await loadCardData(cardUid);
+  if (!cardRecord) {
+    showError("Card ID '" + cardUid + "' not found in database.");
+    render();
+    return;
+  }
+
+  if (cardRecord.bio) {
+    try {
+      const parsed = JSON.parse(cardRecord.bio);
+      if (parsed && typeof parsed === 'object') {
+        state = { ...DEFAULT_STATE, ...parsed };
+      }
+    } catch (_e) {
+      state.bio = cardRecord.bio;
+      if (cardRecord.card_title) state.name = cardRecord.card_title;
+    }
+  }
   render();
 
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -285,15 +277,18 @@ async function handleNfcCardBinding() {
     }
   } else {
     if (session) {
-      await supabaseClient
+      const { error: updateErr } = await supabaseClient
         .from('nfc_cards')
         .update({ user_id: session.user.id })
         .eq('nfc_uid', cardUid);
 
-      isOwner = true;
-      document.getElementById('editFab').classList.remove('hidden');
+      if (!updateErr) {
+        isOwner = true;
+        document.getElementById('editFab').classList.remove('hidden');
+      } else {
+        showError("Failed to claim card: " + updateErr.message);
+      }
     } else {
-      // Show sign in button since card is unclaimed and user is not logged in
       const promptBtn = document.getElementById('authPromptBtn');
       promptBtn.classList.remove('hidden');
       promptBtn.onclick = async () => {
@@ -308,9 +303,7 @@ async function handleNfcCardBinding() {
 
 async function init(){
   populatePlatforms();
-  render();
-
-  await handleNfcCardBinding().catch(console.error);
+  await handleNfcCardBinding().catch(err => showError("Init error: " + err.message));
 
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
   document.getElementById('bioEl').addEventListener('input', e=> state.bio = e.target.textContent);
@@ -321,6 +314,7 @@ async function init(){
   document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
   document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
   document.getElementById('eduColorPick').addEventListener('input', e=>{ state.eduColor = e.target.value; render(); });
+  
   document.getElementById('addWorkBtn').addEventListener('click', ()=>{
     const role = document.getElementById('workRole').value.trim();
     const company = document.getElementById('workCompany').value.trim();
@@ -333,6 +327,7 @@ async function init(){
     document.getElementById('workDuration').value='';
     render();
   });
+
   document.getElementById('addLinkBtn').addEventListener('click', ()=>{
     const platform = document.getElementById('platformSel').value;
     const url = document.getElementById('linkUrl').value.trim();
@@ -341,14 +336,17 @@ async function init(){
     document.getElementById('linkUrl').value='';
     render();
   });
+
   document.getElementById('avatarFile').addEventListener('change', async e=>{
     const file = e.target.files[0]; if(!file) return;
     toDataUrl(file, url=>{ state.avatar = url; render(); });
   });
+
   document.getElementById('coverFile').addEventListener('change', async e=>{
     const file = e.target.files[0]; if(!file) return;
     toDataUrl(file, url=>{ state.cover = url; render(); });
   });
+
   document.getElementById('doneBtn').addEventListener('click', ()=>{ editing=false; render(); });
   
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
@@ -356,13 +354,24 @@ async function init(){
     if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
     statusEl.textContent='Saving to database...';
     try{
-      await saveCardData();
+      const { error } = await supabaseClient
+        .from('nfc_cards')
+        .update({ 
+          bio: JSON.stringify(state),
+          card_title: state.name 
+        })
+        .eq('nfc_uid', currentCardUid);
+
+      if (error) throw error;
       statusEl.textContent='Saved successfully! Changes are now live.';
-    }catch(err){ statusEl.textContent='Could not save: '+(err?.message||'try again'); }
+    }catch(err){ 
+      statusEl.textContent='Could not save: ' + (err?.message || 'try again'); 
+    }
   });
 
   document.getElementById('editFab').addEventListener('click', ()=>{ editing = !editing; render(); });
 }
+
 init();
 </script>
 </body>
