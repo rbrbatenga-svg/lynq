@@ -8,19 +8,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --bg:#f4f5f7; --card:#ffffff; --text:#1a1a1a; --sub:#666;
+  --bg:#f4f5f7; --card:#ffffff; --text:#1a1a1a; --sub:#555555;
   --accent:#4472C4; --overlay:0,0,0; --ovop:0.55;
   color-scheme: light;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
   box-sizing:border-box;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#111214; --card:#1b1c1f; --text:#f2f2f2; --sub:#9a9a9a; color-scheme: dark; }
-}
-:root[data-theme="dark"]{ --bg:#111214; --card:#1b1c1f; --text:#f2f2f2; --sub:#9a9a9a; color-scheme: dark; }
 *{box-sizing:border-box;}
-html,body{margin:0;height:100%; background:var(--bg); color:var(--text);}
+html,body{margin:0;height:100%; background:var(--bg); color:var(--text); transition: background 0.3s ease;}
 body{
   font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   min-height:100%;
@@ -28,16 +24,16 @@ body{
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);}
 .cover{position:relative;height:220px;background-size:cover;background-position:center;overflow:hidden;}
 .cover .ov{position:absolute;inset:0;background:rgba(var(--overlay),var(--ovop));}
-.wrap{max-width:460px;margin:0 auto;padding:0 18px 60px;}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px 60px;width:100%;}
 .card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
-  box-shadow:0 6px 24px rgba(0,0,0,.12);}
+  box-shadow:0 6px 24px rgba(0,0,0,.12);width:100%;}
 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
   margin-top:-70px;display:block;background:var(--accent);}
-h1{font-size:22px;margin:12px 0 4px;}
+h1{font-size:22px;margin:12px 0 4px;color:var(--text);}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
 .edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 10px;}
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.2);background:var(--bg);color:var(--text);}
+.contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.2);background:var(--card);color:var(--text);}
 .contact-btn svg{width:14px;height:14px;flex:none;}
 .work{margin:2px 0 14px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
@@ -46,8 +42,8 @@ h1{font-size:22px;margin:12px 0 4px;}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
 .links{display:flex;flex-direction:column;gap:10px;}
-.linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg);
-  text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.15);}
+.linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--card);
+  text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.2);}
 .linkbtn svg{width:26px;height:26px;flex:none;}
 .linkbtn .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;font-size:18px;}
 .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);
@@ -56,12 +52,12 @@ h1{font-size:22px;margin:12px 0 4px;}
 .inbox-fab{position:fixed;right:84px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#333;
   color:#fff;border:none;border-radius:999px;padding:12px 14px;font-weight:700;font-size:14px;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;display:flex;align-items:center;gap:6px;}
-.panel{background:var(--card);border-radius:14px;padding:16px;margin-top:16px;border:1px solid rgba(127,127,127,.15);}
+.panel{background:var(--card);border-radius:14px;padding:16px;margin-top:16px;border:1px solid rgba(127,127,127,.15);width:100%;}
 .panel h3{margin:0 0 10px;font-size:14px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;}
 .row{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
 .row label{font-size:13px;color:var(--sub);min-width:80px;}
 input[type=text],input[type=url],textarea,select{flex:1;padding:9px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.3);
-  background:var(--bg);color:var(--text);font-size:14px;min-width:120px;}
+  background:var(--card);color:var(--text);font-size:14px;min-width:120px;}
 textarea{width:100%;resize:vertical;min-height:70px;}
 input[type=range]{flex:1;}
 input[type=color]{width:44px;height:34px;border:none;background:none;}
@@ -74,11 +70,11 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 .auth-prompt{font-size:13px;color:var(--accent);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;display:block;}
 
-/* Loading overlay */
+/* Loading screen overlay */
 #loadingScreen {
-  position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+  position: fixed; inset: 0; background: #f4f5f7; z-index: 9999;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 600; color: var(--sub);
+  font-size: 16px; font-weight: 600; color: #555555;
   transition: opacity 0.3s ease;
 }
 
@@ -94,16 +90,13 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
   display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;
 }
 .color-chip {
-  width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(127,127,127,0.3); cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(127,127,127,0.4); cursor: pointer;
 }
 </style>
 <script>
   (function() {
     const savedThemeBg = localStorage.getItem('lynq_bg_theme') || '#f4f5f7';
     document.documentElement.style.setProperty('--bg', savedThemeBg);
-    if(savedThemeBg === '#111214' || savedThemeBg === '#1a1a1a') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
   })();
 </script>
 </head>
@@ -113,7 +106,7 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
-  <div class="card">
+  <div class="card" id="mainCardEl">
     <img class="avatar" id="avatarImg" src="" alt="">
     <h1 id="nameEl"></h1>
     <div class="work" id="workEl"></div>
@@ -131,8 +124,10 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
       </div>
     </div>
 
+    <!-- Sign In Link -->
+    <a class="auth-prompt" id="authPromptBtn">Have a LYNQ card already? Sign in</a>
+
     <div class="status" id="globalErrorEl"></div>
-    <a class="auth-prompt hidden" id="authPromptBtn">Have a LYNQ card already? Sign in</a>
   </div>
 
   <div class="panel hidden" id="editPanel">
@@ -150,11 +145,11 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="row">
       <label>Presets</label>
       <div class="color-chips">
-        <div class="color-chip" style="background:#f4f5f7;" onclick="setBgTheme('#f4f5f7')"></div>
-        <div class="color-chip" style="background:#ffffff;" onclick="setBgTheme('#ffffff')"></div>
-        <div class="color-chip" style="background:#111214;" onclick="setBgTheme('#111214')"></div>
-        <div class="color-chip" style="background:#1a2e40;" onclick="setBgTheme('#1a2e40')"></div>
-        <div class="color-chip" style="background:#2d1b36;" onclick="setBgTheme('#2d1b36')"></div>
+        <div class="color-chip" style="background:#f4f5f7;" title="Clean Light" onclick="setBgTheme('#f4f5f7')"></div>
+        <div class="color-chip" style="background:#ffffff;" title="Pure White" onclick="setBgTheme('#ffffff')"></div>
+        <div class="color-chip" style="background:#111214;" title="Dark Obsidian" onclick="setBgTheme('#111214')"></div>
+        <div class="color-chip" style="background:#0f172a;" title="Slate Navy" onclick="setBgTheme('#0f172a')"></div>
+        <div class="color-chip" style="background:#18181b;" title="Zinc Dark" onclick="setBgTheme('#18181b')"></div>
       </div>
     </div>
 
@@ -243,10 +238,16 @@ function setBgTheme(color) {
   document.documentElement.style.setProperty('--bg', color);
   localStorage.setItem('lynq_bg_theme', color);
   document.getElementById('bgCustomPick').value = color;
-  if(color === '#111214' || color === '#1a2e40' || color === '#2d1b36' || color === '#1a1a1a') {
-    document.documentElement.setAttribute('data-theme', 'dark');
+  
+  // High contrast readability checks for dark vs light themes
+  if(color === '#111214' || color === '#0f172a' || color === '#18181b') {
+    document.documentElement.style.setProperty('--card', '#1e2229');
+    document.documentElement.style.setProperty('--text', '#f8fafc');
+    document.documentElement.style.setProperty('--sub', '#94a3b8');
   } else {
-    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.style.setProperty('--card', '#ffffff');
+    document.documentElement.style.setProperty('--text', '#1a1a1a');
+    document.documentElement.style.setProperty('--sub', '#555555');
   }
 }
 
@@ -254,7 +255,7 @@ function render(){
   document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
   document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
   if(state.bgTheme) {
-    document.documentElement.style.setProperty('--bg', state.bgTheme);
+    setBgTheme(state.bgTheme);
   }
   document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : 'linear-gradient(135deg,#4472C4,#2E5395)';
   document.getElementById('avatarImg').src = state.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%234472C4"/></svg>';
@@ -398,17 +399,17 @@ async function handleNfcCardBinding() {
   render();
 
   const { data: { session } } = await supabaseClient.auth.getSession();
+  const promptBtn = document.getElementById('authPromptBtn');
 
-  if (cardRecord.user_id) {
-    if (session && session.user.id === cardRecord.user_id) {
+  if (session) {
+    if (cardRecord.user_id === session.user.id) {
       isOwner = true;
       document.getElementById('editFab').classList.remove('hidden');
       document.getElementById('inboxFab').classList.remove('hidden');
       document.getElementById('visitorNoteSection').classList.add('hidden');
+      promptBtn.classList.add('hidden');
       fetchInboxNotes();
-    }
-  } else {
-    if (session) {
+    } else if (!cardRecord.user_id) {
       const { error: updateErr } = await supabaseClient
         .from('nfc_cards')
         .update({ user_id: session.user.id })
@@ -419,20 +420,20 @@ async function handleNfcCardBinding() {
         document.getElementById('editFab').classList.remove('hidden');
         document.getElementById('inboxFab').classList.remove('hidden');
         document.getElementById('visitorNoteSection').classList.add('hidden');
+        promptBtn.classList.add('hidden');
         fetchInboxNotes();
       } else {
         showError("Failed to claim card: " + updateErr.message);
       }
-    } else {
-      const promptBtn = document.getElementById('authPromptBtn');
-      promptBtn.classList.remove('hidden');
-      promptBtn.onclick = async () => {
-        await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: window.location.href }
-        });
-      };
     }
+  } else {
+    promptBtn.classList.remove('hidden');
+    promptBtn.onclick = async () => {
+      await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+      });
+    };
   }
 }
 
