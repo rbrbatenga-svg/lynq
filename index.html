@@ -41,11 +41,20 @@ h1{font-size:22px;margin:12px 0 4px;color:var(--text);}
 .worklistitem{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(127,127,127,.15);}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
-.links{display:flex;flex-direction:column;gap:10px;}
-.linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--card);
-  text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.2);}
-.linkbtn svg{width:26px;height:26px;flex:none;}
-.linkbtn .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;font-size:18px;}
+
+/* Links Layout Styles: List vs Grid/App Box */
+.links.list-layout{display:flex;flex-direction:column;gap:10px;}
+.links.list-layout .linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--card);
+  text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.2);width:100%;}
+.links.list-layout .linkbtn svg{width:26px;height:26px;flex:none;}
+.links.list-layout .linkbtn .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;font-size:18px;}
+
+.links.grid-layout{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;}
+.links.grid-layout .linkbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:16px 8px;border-radius:16px;background:var(--card);
+  text-decoration:none;color:var(--text);font-weight:600;font-size:13px;border:1px solid rgba(127,127,127,.2);position:relative;}
+.links.grid-layout .linkbtn svg{width:36px;height:36px;flex:none;}
+.links.grid-layout .linkbtn .rm{position:absolute;top:4px;right:8px;color:#d33;font-weight:700;cursor:pointer;font-size:16px;}
+
 .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);
   color:#fff;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:14px;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;}
@@ -61,14 +70,20 @@ input[type=text],input[type=url],textarea,select{flex:1;padding:9px 10px;border-
 textarea{width:100%;resize:vertical;min-height:70px;}
 input[type=range]{flex:1;}
 input[type=color]{width:44px;height:34px;border:none;background:none;}
-.btn{padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:600;
-  font-size:13px;cursor:pointer;}
-.btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
-.note-section{margin-top:24px;border-top:1px solid rgba(127,127,127,.15);padding-top:16px;}
+.btn{padding:10px 16px;border-radius:8px;border:none;background:var(--accent);color:#ffffff;font-weight:600;
+  font-size:14px;cursor:pointer;}
+.btn.secondary{background:rgba(68, 114, 196, 0.15);color:var(--accent);border:1px solid var(--accent);}
+.note-section{margin-top:24px;border-top:1px solid rgba(127,127,127,.2);padding-top:16px;}
 .note{font-size:12px;color:var(--sub);margin-top:4px;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
-.auth-prompt{font-size:13px;color:var(--accent);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;display:block;}
+
+/* Explicit high-contrast styling for the sign-in button */
+.auth-prompt{
+  font-size:14px; font-weight:600; color:#ffffff; text-align:center;
+  margin-top:24px; padding:12px; border-radius:8px; background:var(--accent);
+  cursor:pointer; text-decoration:none; display:block; box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
 
 /* Loading screen overlay */
 #loadingScreen {
@@ -84,7 +99,7 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
   opacity: 0;
 }
 .note-drawer.open {
-  max-height: 250px; opacity: 1;
+  max-height: 250px; opacity: 1; margin-top: 10px;
 }
 .color-chips {
   display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;
@@ -113,30 +128,39 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
     <div class="contact-row" id="contactRow"></div>
-    <div class="links" id="linksEl"></div>
+    <div class="links list-layout" id="linksEl"></div>
 
     <div class="note-section" id="visitorNoteSection">
       <button class="btn secondary" id="toggleNoteBtn" style="width:100%;">Leave a note</button>
       <div class="note-drawer" id="noteDrawer">
-        <textarea id="visitorNoteText" placeholder="Write a quick message or note..." style="margin-top:12px;"></textarea>
+        <textarea id="visitorNoteText" placeholder="Write a quick message or note..."></textarea>
         <button class="btn" id="sendNoteBtn" style="margin-top:8px; width:100%;">Send Note</button>
         <div class="status" id="noteStatusEl" style="color:var(--sub)"></div>
       </div>
     </div>
 
-    <!-- Sign In Link -->
+    <!-- Clear, High-Contrast Sign In Button -->
     <a class="auth-prompt" id="authPromptBtn">Have a LYNQ card already? Sign in</a>
 
     <div class="status" id="globalErrorEl"></div>
   </div>
 
   <div class="panel hidden" id="editPanel">
-    <h3>Profile</h3>
+    <h3>Profile &amp; Layout</h3>
     <div class="row"><label>Avatar</label><input type="file" id="avatarFile" accept="image/*"></div>
     <div class="row"><label>Cover photo</label><input type="file" id="coverFile" accept="image/*"></div>
     <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
     <div class="row"><label>Accent color</label><input type="color" id="accentPick" value="#4472C4"></div>
     
+    <h3 style="margin-top:18px;">Links Display Style</h3>
+    <div class="row">
+      <label>Layout</label>
+      <select id="layoutStyleSel">
+        <option value="list">List Rows (Classic)</option>
+        <option value="grid">App Grid (Phone App Boxes)</option>
+      </select>
+    </div>
+
     <h3 style="margin-top:18px;">Page Background Theme</h3>
     <div class="row">
       <label>Custom BG</label>
@@ -177,8 +201,9 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 
     <h3 style="margin-top:18px;">Add a link</h3>
     <div class="row">
-      <select id="platformSel"></select>
+      <select id="platformSel" onchange="toggleCustomLabel()"></select>
       <input type="url" id="linkUrl" placeholder="https:// or phone / email">
+      <input type="text" id="customNameInput" class="hidden" placeholder="Custom label (e.g. My Portfolio)">
       <button class="btn" id="addLinkBtn">Add</button>
     </div>
 
@@ -222,6 +247,7 @@ const ICONS = {
 const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", bgTheme:"#f4f5f7",
+  layoutStyle:"list",
   education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
   links:[]
 };
@@ -239,7 +265,6 @@ function setBgTheme(color) {
   localStorage.setItem('lynq_bg_theme', color);
   document.getElementById('bgCustomPick').value = color;
   
-  // High contrast readability checks for dark vs light themes
   if(color === '#111214' || color === '#0f172a' || color === '#18181b') {
     document.documentElement.style.setProperty('--card', '#1e2229');
     document.documentElement.style.setProperty('--text', '#f8fafc');
@@ -248,6 +273,17 @@ function setBgTheme(color) {
     document.documentElement.style.setProperty('--card', '#ffffff');
     document.documentElement.style.setProperty('--text', '#1a1a1a');
     document.documentElement.style.setProperty('--sub', '#555555');
+  }
+}
+
+function toggleCustomLabel() {
+  const sel = document.getElementById('platformSel').value;
+  const customInput = document.getElementById('customNameInput');
+  if (sel === 'website') {
+    customInput.classList.remove('hidden');
+  } else {
+    customInput.classList.add('hidden');
+    customInput.value = '';
   }
 }
 
@@ -288,13 +324,18 @@ function render(){
   workListEl.querySelectorAll('.rm').forEach(el=> el.onclick = ()=>{ state.work.splice(+el.dataset.i,1); render(); });
 
   const linksEl = document.getElementById('linksEl');
+  linksEl.className = 'links ' + (state.layoutStyle === 'grid' ? 'grid-layout' : 'list-layout');
   linksEl.innerHTML = '';
+  
   state.links.forEach((l,i)=>{
     const meta = ICONS[l.platform] || ICONS.website;
     const row = document.createElement(editing ? 'div' : 'a');
     row.className='linkbtn';
     if(!editing){ row.href = l.url; row.target='_blank'; row.rel='noopener'; }
-    row.innerHTML = `<svg viewBox="0 0 24 24">${meta.svg}</svg><span>${meta.label}</span>`;
+    
+    const displayLabel = (l.platform === 'website' && l.customName) ? l.customName : meta.label;
+    
+    row.innerHTML = `<svg viewBox="0 0 24 24">${meta.svg}</svg><span>${displayLabel}</span>`;
     if(editing){
       const rm = document.createElement('span');
       rm.className='rm'; rm.textContent='×';
@@ -309,6 +350,7 @@ function render(){
   document.getElementById('editPanel').classList.toggle('hidden', !editing);
   document.getElementById('opRange').value = Math.round((state.coverOpacity ?? 0.55)*100);
   document.getElementById('accentPick').value = state.accent || '#4472C4';
+  document.getElementById('layoutStyleSel').value = state.layoutStyle || 'list';
   if(state.bgTheme) document.getElementById('bgCustomPick').value = state.bgTheme;
   document.getElementById('eduSchool').value = state.education || '';
   document.getElementById('eduYear').value = state.eduYear || '';
@@ -318,7 +360,6 @@ function render(){
   document.getElementById('phoneInput').value = state.phone || '';
   document.getElementById('emailInput').value = state.email || '';
 
-  // Hide loading screen smoothly
   const loader = document.getElementById('loadingScreen');
   if(loader) {
     loader.style.opacity = '0';
@@ -428,8 +469,9 @@ async function handleNfcCardBinding() {
     }
   } else {
     promptBtn.classList.remove('hidden');
-    promptBtn.onclick = async () => {
-      await supabaseClient.auth.signInWithOAuth({
+    promptBtn.onclick = (e) => {
+      e.preventDefault();
+      supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: window.location.href }
       });
@@ -439,6 +481,7 @@ async function handleNfcCardBinding() {
 
 async function init(){
   populatePlatforms();
+  toggleCustomLabel();
   await handleNfcCardBinding().catch(err => {
     showError("Init error: " + err.message);
     const loader = document.getElementById('loadingScreen');
@@ -449,6 +492,7 @@ async function init(){
   document.getElementById('bioEl').addEventListener('input', e=> state.bio = e.target.textContent);
   document.getElementById('opRange').addEventListener('input', e=>{ state.coverOpacity = e.target.value/100; render(); });
   document.getElementById('accentPick').addEventListener('input', e=>{ state.accent = e.target.value; render(); });
+  document.getElementById('layoutStyleSel').addEventListener('change', e=>{ state.layoutStyle = e.target.value; render(); });
   document.getElementById('bgCustomPick').addEventListener('input', e=>{ setBgTheme(e.target.value); });
   document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
   document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
@@ -458,7 +502,6 @@ async function init(){
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
   document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
-  // Smooth toggle note drawer
   document.getElementById('toggleNoteBtn').addEventListener('click', ()=>{
     const drawer = document.getElementById('noteDrawer');
     drawer.classList.toggle('open');
@@ -482,9 +525,11 @@ async function init(){
   document.getElementById('addLinkBtn').addEventListener('click', ()=>{
     const platform = document.getElementById('platformSel').value;
     const url = document.getElementById('linkUrl').value.trim();
+    const customName = document.getElementById('customNameInput').value.trim();
     if(!url) return;
-    state.links.push({platform, url});
+    state.links.push({platform, url, customName: platform === 'website' ? customName : ''});
     document.getElementById('linkUrl').value='';
+    document.getElementById('customNameInput').value='';
     render();
   });
 
