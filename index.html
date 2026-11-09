@@ -32,13 +32,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
   box-shadow:0 6px 24px rgba(0,0,0,.12);width:100%; z-index:5;}
 
-/* Header layout: Profile photo on left, Share button next to it, Gallery button on opposite side */
+/* Header layout: Profile photo on left, Share button & Info button next to it, Gallery button on right */
 .avatar-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-70px;margin-bottom:12px;}
-.avatar-left-group{display:flex;align-items:flex-end;gap:10px;}
+.avatar-left-group{display:flex;align-items:flex-end;gap:8px;}
 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
   display:block;background:var(--accent);}
-.share-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(127,127,127,.25);background:var(--card);color:var(--text);cursor:pointer;margin-bottom:6px;}
-.share-btn svg{width:18px;height:18px;stroke:var(--accent);fill:none;}
+.share-btn, .info-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(127,127,127,.25);background:var(--card);color:var(--text);cursor:pointer;margin-bottom:6px;}
+.share-btn svg, .info-btn svg{width:18px;height:18px;stroke:var(--accent);fill:none;}
 
 .gallery-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid rgba(127,127,127,.25);background:var(--card);color:var(--text);cursor:pointer;margin-bottom:6px;}
 .gallery-btn svg{width:16px;height:16px;flex:none;stroke:var(--accent);}
@@ -168,7 +168,7 @@ input[type=range]{flex:1;}
   width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.15);
 }
 
-/* Modal Popup for Photos Gallery */
+/* Modal Popup for Photos Gallery & Info Guide */
 .modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s ease;
 }
@@ -185,6 +185,12 @@ input[type=range]{flex:1;}
 .modal-gallery-img {
   width:100%; border-radius:12px; object-fit:cover; border:1px solid rgba(127,127,127,0.2); max-height:260px;
 }
+.guide-content {
+  font-size: 13px; color: var(--sub); line-height: 1.5; margin-top: 10px;
+}
+.guide-content h4 {
+  color: var(--text); font-size: 14px; margin: 12px 0 4px;
+}
 </style>
 <script>
   const THEMES = {
@@ -194,7 +200,7 @@ input[type=range]{flex:1;}
     'white-black': { bg:'#f8fafc', card:'#ffffff', text:'#0f172a', sub:'#475569', accent:'#0f172a', cover:'linear-gradient(135deg,#334155,#0f172a)' },
     'lgbt-pride': { bg:'#1a1025', card:'#261836', text:'#ffffff', sub:'#d8b4fe', accent:'#ec4899', cover:'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7)' },
     'midnight-blue': { bg:'#090d16', card:'#111827', text:'#f3f4f6', sub:'#9ca3af', accent:'#3b82f6', cover:'linear-gradient(135deg,#1e40af,#1e1b4b)' },
-    'emerald-dark': { bg:'#061a14', card:'#0f2922', text:'#ecfdf5', sub:'#6ee7b7', accent:'#10b981', cover:'linear-gradient(135deg,#047857,#064e3b)' },
+    'emerald-dark': { bg:'#061a14', card:'#0f2922', text:#ecfdf5', sub:'#6ee7b7', accent:'#10b981', cover:'linear-gradient(135deg,#047857,#064e3b)' },
     'sunset-amber': { bg:'#1c120c', card:'#2b1c14', text:'#fffbeb', sub:'#fde68a', accent:'#f59e0b', cover:'linear-gradient(135deg,#d97706,#b45309)' }
   };
 
@@ -220,12 +226,15 @@ input[type=range]{flex:1;}
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
   <div class="card" id="mainCardEl">
-    <!-- Header Row: Profile Photo on Left, Share Button Next to It, Gallery Button on Right -->
+    <!-- Header Row: Profile Photo on Left, Share Button & Info Button Next to It, Gallery Button on Right -->
     <div class="avatar-row">
       <div class="avatar-left-group">
         <img class="avatar" id="avatarImg" src="" alt="">
         <button class="share-btn" id="shareBtn" title="Share Portfolio">
           <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="info-btn" id="infoBtn" title="Help Guide">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         </button>
       </div>
       <button class="gallery-btn hidden" id="openGalleryBtn">
@@ -307,7 +316,7 @@ input[type=range]{flex:1;}
     <div class="row"><label>Languages</label><input type="text" id="languagesInput" placeholder="e.g. English, Tagalog, Bahasa Indonesia"></div>
     <div class="row"><label>Hobbies</label><input type="text" id="hobbiesInput" placeholder="e.g. Martial arts, Gaming, Reading"></div>
 
-    <h3 style="margin-top:18px;">Direct Contact Info</h3>
+    <h3 style="margin-top:18px;">Direct Link Info</h3>
     <div class="row"><label>Phone Number</label><input type="text" id="phoneInput" placeholder="e.g. +639123456789"></div>
     <div class="row"><label>Email Address</label><input type="text" id="emailInput" placeholder="e.g. name@example.com"></div>
 
@@ -354,6 +363,25 @@ input[type=range]{flex:1;}
     <span class="modal-close" id="closeGalleryBtn">&times;</span>
     <h3 style="margin:0 0 12px; font-size:16px; color:var(--text);">Photos</h3>
     <div class="modal-gallery-grid" id="modalGalleryGrid"></div>
+  </div>
+</div>
+
+<!-- Modal Popup Container for Info Guide -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal-body">
+    <span class="modal-close" id="closeInfoBtn">&times;</span>
+    <h3 style="margin:0 0 4px; font-size:16px; color:var(--text);">Help &amp; Setup Guide</h3>
+    <div class="guide-content">
+      <h4>How to set up your card</h4>
+      <p>Tap your LYNQ card with your phone. When the page opens, click <b>"Sign in"</b> at the bottom to connect your Google account and claim your card.</p>
+      
+      <h4>Why won't the Sign in button work sometimes?</h4>
+      <p>Sometimes apps like Facebook, Messenger, or Instagram trap web pages inside a tiny helper window that blocks Google from opening. The app gets confused and hides your editing powers, making you look like a regular visitor!</p>
+      
+      <h4>How to fix it and edit your card</h4>
+      <p>• <b>Open in a real browser:</b> Tap the three dots (menu) in the corner of your app and choose <b>"Open in Chrome"</b> or <b>"Open in Safari"</b>.</p>
+      <p>• <b>Use Incognito / Private mode:</b> Copy your card link, open a new Incognito tab in your browser, paste the link, and press Sign in safely.</p>
+    </div>
   </div>
 </div>
 
@@ -714,6 +742,17 @@ async function init(){
     } catch (err) {
       console.log('Share error:', err);
     }
+  });
+
+  // Info modal controls
+  document.getElementById('infoBtn').addEventListener('click', () => {
+    document.getElementById('infoModal').classList.add('open');
+  });
+  document.getElementById('closeInfoBtn').addEventListener('click', () => {
+    document.getElementById('infoModal').classList.remove('open');
+  });
+  document.getElementById('infoModal').addEventListener('click', (e) => {
+    if(e.target.id === 'infoModal') document.getElementById('infoModal').classList.remove('open');
   });
 
   document.getElementById('openGalleryBtn').addEventListener('click', () => {
