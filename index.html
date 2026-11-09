@@ -84,7 +84,6 @@ input[type=text],input[type=url],textarea,select{flex:1;padding:9px 10px;border-
   background:var(--card);color:var(--text);font-size:14px;min-width:120px;}
 textarea{width:100%;resize:vertical;min-height:70px;}
 input[type=range]{flex:1;}
-input[type=color]{width:44px;height:34px;border:none;background:none;}
 .btn{padding:10px 16px;border-radius:8px;border:none;background:var(--accent);color:#ffffff;font-weight:600;
   font-size:14px;cursor:pointer;}
 .btn.secondary{background:rgba(68, 114, 196, 0.15);color:var(--accent);border:1px solid var(--accent);}
@@ -114,10 +113,22 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 }
 
 #loadingScreen {
-  position: fixed; inset: 0; background: #f4f5f7; z-index: 9999;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 600; color: #555555;
+  position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   transition: opacity 0.3s ease;
+}
+.loader-content {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+}
+.loader-logo {
+  display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: var(--text);
+  letter-spacing: .05em;
+}
+.loader-logo svg {
+  width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 2.2;
+}
+.loader-text {
+  font-size: 12px; font-weight: 500; color: var(--sub);
 }
 
 .note-drawer {
@@ -127,11 +138,16 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .note-drawer.open {
   max-height: 250px; opacity: 1; margin-top: 10px;
 }
-.color-chips {
-  display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;
+
+/* Theme Presets Selection Grid */
+.theme-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; margin-top: 4px;
 }
-.color-chip {
-  width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(127,127,127,0.4); cursor: pointer;
+.theme-card {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(127,127,127,0.3); background: var(--card); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text);
+}
+.theme-preview {
+  width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.15);
 }
 
 /* Modal Popup for Photos Gallery */
@@ -153,15 +169,36 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 }
 </style>
 <script>
+  // High-contrast predefined themes guaranteeing clear text and SVG contrast
+  const THEMES = {
+    'clean-light': { bg:'#f4f5f7', card:'#ffffff', text:'#1a1a1a', sub:'#555555', accent:'#4472C4', cover:'linear-gradient(135deg,#4472C4,#2E5395)' },
+    'black-gray': { bg:'#121212', card:'#1e1e1e', text:'#f1f1f1', sub:'#a0a0a0', accent:'#888888', cover:'linear-gradient(135deg,#242424,#0d0d0d)' },
+    'white-pink': { bg:'#fff0f5', card:'#ffffff', text:'#2d132c', sub:'#6b4c68', accent:'#d81b60', cover:'linear-gradient(135deg,#ff80bf,#ffb3d9)' },
+    'white-black': { bg:'#f8fafc', card:'#ffffff', text:'#0f172a', sub:'#475569', accent:'#0f172a', cover:'linear-gradient(135deg,#334155,#0f172a)' },
+    'lgbt-pride': { bg:'#1a1025', card:'#261836', text:'#ffffff', sub:'#d8b4fe', accent:'#ec4899', cover:'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7)' },
+    'midnight-blue': { bg:'#090d16', card:'#111827', text:'#f3f4f6', sub:'#9ca3af', accent:'#3b82f6', cover:'linear-gradient(135deg,#1e40af,#1e1b4b)' },
+    'emerald-dark': { bg:'#061a14', card:'#0f2922', text:'#ecfdf5', sub:'#6ee7b7', accent:'#10b981', cover:'linear-gradient(135deg,#047857,#064e3b)' },
+    'sunset-amber': { bg:'#1c120c', card:'#2b1c14', text:'#fffbeb', sub:'#fde68a', accent:'#f59e0b', cover:'linear-gradient(135deg,#d97706,#b45309)' }
+  };
+
   (function() {
-    const savedThemeBg = localStorage.getItem('lynq_bg_theme') || '#f4f5f7';
-    document.documentElement.style.setProperty('--bg', savedThemeBg);
+    const savedKey = localStorage.getItem('lynq_theme_key') || 'clean-light';
+    const t = THEMES[savedKey] || THEMES['clean-light'];
+    document.documentElement.style.setProperty('--bg', t.bg);
   })();
 </script>
 </head>
 <body>
 
-<div id="loadingScreen">Loading information, please wait</div>
+<div id="loadingScreen">
+  <div class="loader-content">
+    <div class="loader-logo">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      LYNQ
+    </div>
+    <div class="loader-text">Loading information, please wait</div>
+  </div>
+</div>
 
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
@@ -205,8 +242,19 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="row"><label>Avatar</label><input type="file" id="avatarFile" accept="image/*"></div>
     <div class="row"><label>Cover photo</label><input type="file" id="coverFile" accept="image/*"></div>
     <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
-    <div class="row"><label>Accent color</label><input type="color" id="accentPick" value="#4472C4"></div>
     
+    <h3 style="margin-top:18px;">Aesthetic Color Presets</h3>
+    <div class="theme-grid">
+      <div class="theme-card" onclick="applyThemePreset('clean-light')"><div class="theme-preview" style="background:#4472C4;"></div>Clean Light</div>
+      <div class="theme-card" onclick="applyThemePreset('black-gray')"><div class="theme-preview" style="background:linear-gradient(135deg,#242424,#0d0d0d);"></div>Black &amp; Gray</div>
+      <div class="theme-card" onclick="applyThemePreset('white-pink')"><div class="theme-preview" style="background:linear-gradient(135deg,#ff80bf,#ffb3d9);"></div>White &amp; Pink</div>
+      <div class="theme-card" onclick="applyThemePreset('white-black')"><div class="theme-preview" style="background:linear-gradient(135deg,#334155,#0f172a);"></div>White &amp; Black</div>
+      <div class="theme-card" onclick="applyThemePreset('lgbt-pride')"><div class="theme-preview" style="background:linear-gradient(90deg, red, orange, yellow, green, blue, purple);"></div>LGBT Pride</div>
+      <div class="theme-card" onclick="applyThemePreset('midnight-blue')"><div class="theme-preview" style="background:linear-gradient(135deg,#1e40af,#1e1b4b);"></div>Midnight Blue</div>
+      <div class="theme-card" onclick="applyThemePreset('emerald-dark')"><div class="theme-preview" style="background:linear-gradient(135deg,#047857,#064e3b);"></div>Emerald Dark</div>
+      <div class="theme-card" onclick="applyThemePreset('sunset-amber')"><div class="theme-preview" style="background:linear-gradient(135deg,#d97706,#b45309);"></div>Sunset Amber</div>
+    </div>
+
     <h3 style="margin-top:18px;">Work City &amp; Country</h3>
     <div class="row"><label>City, Country</label><input type="text" id="workCityCountry" placeholder="e.g. Davao City, Philippines"></div>
 
@@ -224,27 +272,10 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
       </select>
     </div>
 
-    <h3 style="margin-top:18px;">Page Background Theme</h3>
-    <div class="row">
-      <label>Custom BG</label>
-      <input type="color" id="bgCustomPick" value="#f4f5f7">
-    </div>
-    <div class="row">
-      <label>Presets</label>
-      <div class="color-chips">
-        <div class="color-chip" style="background:#f4f5f7;" title="Clean Light" onclick="setBgTheme('#f4f5f7')"></div>
-        <div class="color-chip" style="background:#ffffff;" title="Pure White" onclick="setBgTheme('#ffffff')"></div>
-        <div class="color-chip" style="background:#111214;" title="Dark Obsidian" onclick="setBgTheme('#111214')"></div>
-        <div class="color-chip" style="background:#0f172a;" title="Slate Navy" onclick="setBgTheme('#0f172a')"></div>
-        <div class="color-chip" style="background:#18181b;" title="Zinc Dark" onclick="setBgTheme('#18181b')"></div>
-      </div>
-    </div>
-
     <div class="note" style="margin-top:10px;">Click your name or bio above to edit them directly.</div>
 
     <h3 style="margin-top:18px;">Education (optional)</h3>
     <div class="row"><label>Level</label><select id="eduLevel"><option value="">— Select —</option><option value="High School">High School</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option><option value="Med School">Med School</option><option value="Law School">Law School</option></select></div>
-    <div class="row"><label>Tag color</label><input type="color" id="eduColorPick" value="#4472C4"></div>
     <div class="row"><label>School/Course</label><input type="text" id="eduSchool" placeholder="e.g. BS Computer Science"></div>
     <div class="row"><label>Year</label><input type="text" id="eduYear" placeholder="e.g. 3rd Year"></div>
     <div class="row"><label>Section</label><input type="text" id="eduSection" placeholder="optional, e.g. Section A"></div>
@@ -327,7 +358,7 @@ const ICONS = {
 
 const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
-  avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", bgTheme:"#f4f5f7",
+  avatar:"", cover:"", coverOpacity:0.55, themeKey:"clean-light",
   layoutStyle:"list", photos:[], workCityCountry:"",
   education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
   links:[]
@@ -340,21 +371,16 @@ function showError(msg) {
   document.getElementById('globalErrorEl').textContent = msg;
 }
 
-function setBgTheme(color) {
-  state.bgTheme = color;
-  document.documentElement.style.setProperty('--bg', color);
-  localStorage.setItem('lynq_bg_theme', color);
-  document.getElementById('bgCustomPick').value = color;
-  
-  if(color === '#111214' || color === '#0f172a' || color === '#18181b') {
-    document.documentElement.style.setProperty('--card', '#1e2229');
-    document.documentElement.style.setProperty('--text', '#f8fafc');
-    document.documentElement.style.setProperty('--sub', '#94a3b8');
-  } else {
-    document.documentElement.style.setProperty('--card', '#ffffff');
-    document.documentElement.style.setProperty('--text', '#1a1a1a');
-    document.documentElement.style.setProperty('--sub', '#555555');
-  }
+function applyThemePreset(key) {
+  const t = THEMES[key] || THEMES['clean-light'];
+  state.themeKey = key;
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--card', t.card);
+  document.documentElement.style.setProperty('--text', t.text);
+  document.documentElement.style.setProperty('--sub', t.sub);
+  document.documentElement.style.setProperty('--accent', t.accent);
+  localStorage.setItem('lynq_theme_key', key);
+  render();
 }
 
 function toggleCustomLabel() {
@@ -394,19 +420,22 @@ function compressImage(file, maxWidth, quality, callback) {
 }
 
 function render(){
-  document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
+  const t = THEMES[state.themeKey || 'clean-light'] || THEMES['clean-light'];
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--card', t.card);
+  document.documentElement.style.setProperty('--text', t.text);
+  document.documentElement.style.setProperty('--sub', t.sub);
+  document.documentElement.style.setProperty('--accent', t.accent);
   document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
-  if(state.bgTheme) {
-    setBgTheme(state.bgTheme);
-  }
-  document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : 'linear-gradient(135deg,#4472C4,#2E5395)';
+
+  document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : t.cover;
   document.getElementById('avatarImg').src = state.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%234472C4"/></svg>';
   document.getElementById('nameEl').textContent = state.name;
   document.getElementById('bioEl').textContent = state.bio;
   
   const eduParts = [state.eduLevel, state.education, state.eduYear, state.eduSection].filter(Boolean);
   const eduEl = document.getElementById('eduTag');
-  eduEl.style.setProperty('--tagcolor', state.eduColor || state.accent || '#4472C4');
+  eduEl.style.setProperty('--tagcolor', t.accent);
   if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
   
   const contactRow = document.getElementById('contactRow');
@@ -475,15 +504,12 @@ function render(){
   document.getElementById('bioEl').contentEditable = editing;
   document.getElementById('editPanel').classList.toggle('hidden', !editing);
   document.getElementById('opRange').value = Math.round((state.coverOpacity ?? 0.55)*100);
-  document.getElementById('accentPick').value = state.accent || '#4472C4';
   document.getElementById('layoutStyleSel').value = state.layoutStyle || 'list';
   document.getElementById('workCityCountry').value = state.workCityCountry || '';
-  if(state.bgTheme) document.getElementById('bgCustomPick').value = state.bgTheme;
   document.getElementById('eduSchool').value = state.education || '';
   document.getElementById('eduYear').value = state.eduYear || '';
   document.getElementById('eduSection').value = state.eduSection || '';
   document.getElementById('eduLevel').value = state.eduLevel || '';
-  document.getElementById('eduColorPick').value = state.eduColor || state.accent || '#4472C4';
   document.getElementById('phoneInput').value = state.phone || '';
   document.getElementById('emailInput').value = state.email || '';
 
@@ -655,15 +681,12 @@ async function init(){
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
   document.getElementById('bioEl').addEventListener('input', e=> state.bio = e.target.textContent);
   document.getElementById('opRange').addEventListener('input', e=>{ state.coverOpacity = e.target.value/100; render(); });
-  document.getElementById('accentPick').addEventListener('input', e=>{ state.accent = e.target.value; render(); });
   document.getElementById('layoutStyleSel').addEventListener('change', e=>{ state.layoutStyle = e.target.value; render(); });
   document.getElementById('workCityCountry').addEventListener('input', e=>{ state.workCityCountry = e.target.value; render(); });
-  document.getElementById('bgCustomPick').addEventListener('input', e=>{ setBgTheme(e.target.value); });
   document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
   document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
   document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
   document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
-  document.getElementById('eduColorPick').addEventListener('input', e=>{ state.eduColor = e.target.value; render(); });
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
   document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
