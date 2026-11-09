@@ -42,9 +42,14 @@ h1{font-size:22px;margin:12px 0 4px;color:var(--text);}
 .work{margin:2px 0 14px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
 .workrow .dur{color:var(--sub);font-size:12px;}
+.worklocation{font-size:13px;color:var(--sub);margin-bottom:8px;}
 .worklistitem{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(127,127,127,.15);}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
+
+/* User Photo Gallery Grid */
+.gallery-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin:14px 0;}
+.gallery-img{width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;border:1px solid rgba(127,127,127,.2);}
 
 /* Links Layout Styles */
 .links.list-layout{display:flex;flex-direction:column;gap:10px;}
@@ -83,11 +88,11 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 
 .auth-prompt{
-  font-size:12px; color:var(--sub); text-align:center;
-  margin-top:18px; cursor:pointer; text-decoration:underline; display:block;
-  background:none; border:none; padding:0; box-shadow:none;
+  font-size:13px; color:var(--sub); text-align:center; margin-top:20px; display:block;
 }
-.auth-prompt:hover{ color:var(--accent); }
+.auth-prompt a{
+  color:var(--accent); text-decoration:underline; font-weight:600; cursor:pointer;
+}
 
 .note-item {
   padding: 10px 0; border-bottom: 1px solid rgba(127,127,127,.15); position: relative;
@@ -134,9 +139,14 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <img class="avatar" id="avatarImg" src="" alt="">
     <h1 id="nameEl"></h1>
     <div class="work" id="workEl"></div>
+    <div class="worklocation" id="workLocationEl"></div>
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
     <div class="contact-row" id="contactRow"></div>
+    
+    <!-- Gallery Grid for 3 Photos -->
+    <div class="gallery-grid hidden" id="galleryGrid"></div>
+
     <div class="links list-layout" id="linksEl"></div>
 
     <div class="note-section" id="visitorNoteSection">
@@ -148,7 +158,9 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
       </div>
     </div>
 
-    <a class="auth-prompt" id="authPromptBtn">Have a LYNQ card already? Sign in</a>
+    <div class="auth-prompt" id="authPromptBtn">
+      Have a LYNQ card already? <a id="signInLink">Sign in</a>
+    </div>
 
     <div class="status" id="globalErrorEl"></div>
   </div>
@@ -160,6 +172,14 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
     <div class="row"><label>Accent color</label><input type="color" id="accentPick" value="#4472C4"></div>
     
+    <h3 style="margin-top:18px;">Work City &amp; Country</h3>
+    <div class="row"><label>City, Country</label><input type="text" id="workCityCountry" placeholder="e.g. Davao City, Philippines"></div>
+
+    <h3 style="margin-top:18px;">Portfolio Photos (3 max)</h3>
+    <div class="row"><label>Photo 1</label><input type="file" id="photoFile1" accept="image/*"></div>
+    <div class="row"><label>Photo 2</label><input type="file" id="photoFile2" accept="image/*"></div>
+    <div class="row"><label>Photo 3</label><input type="file" id="photoFile3" accept="image/*"></div>
+
     <h3 style="margin-top:18px;">Links Display Style</h3>
     <div class="row">
       <label>Layout</label>
@@ -255,7 +275,7 @@ const ICONS = {
 const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", bgTheme:"#f4f5f7",
-  layoutStyle:"list",
+  layoutStyle:"list", photos:[], workCityCountry:"",
   education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
   links:[]
 };
@@ -295,6 +315,31 @@ function toggleCustomLabel() {
   }
 }
 
+function compressImage(file, maxWidth, quality, callback) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = (event) => {
+    const img = new Image();
+    img.src = event.target.result;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+  };
+}
+
 function render(){
   document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
   document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
@@ -320,6 +365,27 @@ function render(){
     contactHtml += `<a class="contact-btn" href="mailto:${state.email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg> Email</a>`;
   }
   contactRow.innerHTML = contactHtml;
+
+  // Render City and Country Location
+  const workLocationEl = document.getElementById('workLocationEl');
+  if (state.workCityCountry) {
+    workLocationEl.textContent = state.workCityCountry;
+    workLocationEl.classList.remove('hidden');
+  } else {
+    workLocationEl.classList.add('hidden');
+    workLocationEl.textContent = '';
+  }
+
+  // Render 3 Photo Gallery
+  const galleryGrid = document.getElementById('galleryGrid');
+  const photos = state.photos || [];
+  if (photos.length > 0) {
+    galleryGrid.classList.remove('hidden');
+    galleryGrid.innerHTML = photos.map(src => `<img class="gallery-img" src="${src}">`).join('');
+  } else {
+    galleryGrid.classList.add('hidden');
+    galleryGrid.innerHTML = '';
+  }
 
   const workEl = document.getElementById('workEl');
   const work = state.work || [];
@@ -359,6 +425,7 @@ function render(){
   document.getElementById('opRange').value = Math.round((state.coverOpacity ?? 0.55)*100);
   document.getElementById('accentPick').value = state.accent || '#4472C4';
   document.getElementById('layoutStyleSel').value = state.layoutStyle || 'list';
+  document.getElementById('workCityCountry').value = state.workCityCountry || '';
   if(state.bgTheme) document.getElementById('bgCustomPick').value = state.bgTheme;
   document.getElementById('eduSchool').value = state.education || '';
   document.getElementById('eduYear').value = state.eduYear || '';
@@ -378,12 +445,6 @@ function render(){
 function populatePlatforms(){
   const sel = document.getElementById('platformSel');
   sel.innerHTML = Object.entries(ICONS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
-}
-
-function toDataUrl(file, cb){
-  const r = new FileReader();
-  r.onload = ()=>cb(r.result);
-  r.readAsDataURL(file);
 }
 
 async function deleteNote(noteId) {
@@ -467,6 +528,7 @@ async function handleNfcCardBinding() {
 
   const { data: { session } } = await supabaseClient.auth.getSession();
   const promptBtn = document.getElementById('authPromptBtn');
+  const signInLink = document.getElementById('signInLink');
 
   if (session) {
     if (cardRecord.user_id === session.user.id) {
@@ -495,7 +557,7 @@ async function handleNfcCardBinding() {
     }
   } else {
     promptBtn.classList.remove('hidden');
-    promptBtn.onclick = (e) => {
+    signInLink.onclick = (e) => {
       e.preventDefault();
       supabaseClient.auth.signInWithOAuth({
         provider: 'google',
@@ -519,6 +581,7 @@ async function init(){
   document.getElementById('opRange').addEventListener('input', e=>{ state.coverOpacity = e.target.value/100; render(); });
   document.getElementById('accentPick').addEventListener('input', e=>{ state.accent = e.target.value; render(); });
   document.getElementById('layoutStyleSel').addEventListener('change', e=>{ state.layoutStyle = e.target.value; render(); });
+  document.getElementById('workCityCountry').addEventListener('input', e=>{ state.workCityCountry = e.target.value; render(); });
   document.getElementById('bgCustomPick').addEventListener('input', e=>{ setBgTheme(e.target.value); });
   document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
   document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
@@ -528,6 +591,32 @@ async function init(){
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
   document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
+  const setupPhotoUpload = (inputId, index) => {
+    document.getElementById(inputId).addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      compressImage(file, 600, 0.7, compressedUrl => {
+        state.photos = state.photos || [];
+        state.photos[index] = compressedUrl;
+        render();
+      });
+    });
+  };
+
+  setupPhotoUpload('photoFile1', 0);
+  setupPhotoUpload('photoFile2', 1);
+  setupPhotoUpload('photoFile3', 2);
+
+  document.getElementById('avatarFile').addEventListener('change', e => {
+    const file = e.target.files[0]; if(!file) return;
+    compressImage(file, 300, 0.8, url => { state.avatar = url; render(); });
+  });
+
+  document.getElementById('coverFile').addEventListener('change', e => {
+    const file = e.target.files[0]; if(!file) return;
+    compressImage(file, 800, 0.7, url => { state.cover = url; render(); });
+  });
+
   document.getElementById('toggleNoteBtn').addEventListener('click', ()=>{
     const drawer = document.getElementById('noteDrawer');
     drawer.classList.toggle('open');
@@ -559,16 +648,6 @@ async function init(){
     render();
   });
 
-  document.getElementById('avatarFile').addEventListener('change', async e=>{
-    const file = e.target.files[0]; if(!file) return;
-    toDataUrl(file, url=>{ state.avatar = url; render(); });
-  });
-
-  document.getElementById('coverFile').addEventListener('change', async e=>{
-    const file = e.target.files[0]; if(!file) return;
-    toDataUrl(file, url=>{ state.cover = url; render(); });
-  });
-
   document.getElementById('doneBtn').addEventListener('click', ()=>{ editing=false; render(); });
   
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
@@ -576,10 +655,11 @@ async function init(){
     if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
     statusEl.textContent='Saving to database...';
     try{
+      const payload = JSON.stringify(state);
       const { error } = await supabaseClient
         .from('nfc_cards')
         .update({ 
-          bio: JSON.stringify(state),
+          bio: payload,
           card_title: state.name 
         })
         .eq('nfc_uid', currentCardUid);
@@ -587,7 +667,7 @@ async function init(){
       if (error) throw error;
       statusEl.textContent='Saved successfully! Changes are now live.';
     }catch(err){ 
-      statusEl.textContent='Could not save: ' + (err?.message || 'try again'); 
+      statusEl.textContent='Could not save: ' + (err?.message || 'Check database string size or internet connection.'); 
     }
   });
 
