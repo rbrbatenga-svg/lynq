@@ -25,4 +25,318 @@ body{
   font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:var(--bg); color:var(--text); min-height:100%;
 }
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);}
+.cover{position:relative;height:220px;background-size:cover;background-position:center;overflow:hidden;}
+.cover .ov{position:absolute;inset:0;background:rgba(var(--overlay),var(--ovop));}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px 60px;}
+.card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
+  box-shadow:0 6px 24px rgba(0,0,0,.12);}
+.avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
+  margin-top:-70px;display:block;background:var(--accent);}
+h1{font-size:22px;margin:12px 0 4px;}
+.bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
+.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 16px;}
+.work{margin:2px 0 14px;}
+.workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
+.workrow .dur{color:var(--sub);font-size:12px;}
+.worklistitem{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(127,127,127,.15);}
+.worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
+[contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
+.links{display:flex;flex-direction:column;gap:10px;}
+.linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg);
+  text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.15);}
+.linkbtn svg{width:26px;height:26px;flex:none;}
+.linkbtn .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;font-size:18px;}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);
+  color:#fff;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:14px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;}
+.panel{background:var(--card);border-radius:14px;padding:16px;margin-top:16px;border:1px solid rgba(127,127,127,.15);}
+.panel h3{margin:0 0 10px;font-size:14px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;}
+.row{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.row label{font-size:13px;color:var(--sub);min-width:80px;}
+input[type=text],input[type=url],select{flex:1;padding:9px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.3);
+  background:var(--bg);color:var(--text);font-size:14px;min-width:120px;}
+input[type=range]{flex:1;}
+input[type=color]{width:44px;height:34px;border:none;background:none;}
+.btn{padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:600;
+  font-size:13px;cursor:pointer;}
+.btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.note{font-size:12px;color:var(--sub);margin-top:4px;}
+.hidden{display:none !important;}
+.status{font-size:12px;color:var(--sub);text-align:center;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="cover" id="coverEl"><div class="ov"></div></div>
+<div class="wrap">
+  <div class="card">
+    <img class="avatar" id="avatarImg" src="" alt="">
+    <h1 id="nameEl"></h1>
+    <div class="work" id="workEl"></div>
+    <p class="bio" id="bioEl"></p>
+    <div class="edutag hidden" id="eduTag"></div>
+    <div class="links" id="linksEl"></div>
+  </div>
+
+  <div class="panel hidden" id="editPanel">
+    <h3>Profile</h3>
+    <div class="row"><label>Avatar</label><input type="file" id="avatarFile" accept="image/*"></div>
+    <div class="row"><label>Cover photo</label><input type="file" id="coverFile" accept="image/*"></div>
+    <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
+    <div class="row"><label>Accent color</label><input type="color" id="accentPick" value="#4472C4"></div>
+    <div class="note">Click your name or bio above to edit them directly.</div>
+
+    <h3 style="margin-top:18px;">Education (optional)</h3>
+    <div class="row"><label>Level</label><select id="eduLevel"><option value="">— Select —</option><option value="High School">High School</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option><option value="Med School">Med School</option><option value="Law School">Law School</option></select></div>
+    <div class="row"><label>Tag color</label><input type="color" id="eduColorPick" value="#4472C4"></div>
+    <div class="row"><label>School/Course</label><input type="text" id="eduSchool" placeholder="e.g. BS Computer Science"></div>
+    <div class="row"><label>Year</label><input type="text" id="eduYear" placeholder="e.g. 3rd Year"></div>
+    <div class="row"><label>Section</label><input type="text" id="eduSection" placeholder="optional, e.g. Section A"></div>
+
+    <h3 style="margin-top:18px;">Work Experience (optional)</h3>
+    <div id="workList"></div>
+    <div class="row">
+      <input type="text" id="workRole" placeholder="Role / Position">
+      <input type="text" id="workCompany" placeholder="Company">
+      <input type="text" id="workDuration" placeholder="Duration (optional)">
+      <button class="btn" id="addWorkBtn">Add</button>
+    </div>
+
+    <h3 style="margin-top:18px;">Add a link</h3>
+    <div class="row">
+      <select id="platformSel"></select>
+      <input type="url" id="linkUrl" placeholder="https:// or phone / email">
+      <button class="btn" id="addLinkBtn">Add</button>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn" id="saveBtn">Save &amp; Publish</button>
+      <button class="btn secondary" id="doneBtn">Done editing</button>
+    </div>
+    <div class="status" id="statusEl"></div>
+  </div>
+</div>
+
+<button class="fab hidden" id="editFab">Edit</button>
+
+<script id="state-data" type="application/json">{"name":"Rex Belli R. Batenga, RCrim","bio":"Jimboy pisot hehehe","avatar":"","cover":"","coverOpacity":0.9,"accent":"#000000","theme":"light","links":[{"platform":"instagram","url":"kk"},{"platform":"facebook","url":"kk"},{"platform":"telegram","url":"kk"}],"eduLevel":"Masteral","education":"MSCJE","eduYear":"1st year","work":[{"role":"International Relations Officer","company":"Jose Maria College Foundation, Inc.","duration":""}],"eduColor":"#ffffff"}</script>
+<script>
+// Supabase Configuration
+const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2c2lzcGxweWpjcWVpbHlrc3d4Iiwicm9sZS5hbm9uIiwiaWF0cyI6ImlzaWIgK1F0UGWN...'; // Or your active public anon key if needed, or initialized safely:
+const supabaseClient = window.supabase.createClient('https://wvsisplpyjcqeilykswx.supabase.co', 'YOUR_SUPABASE_ANON_KEY_HERE');
+
+const ICONS = {
+  instagram:{label:"Instagram",color:"#E1306C",svg:'<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="17" cy="7" r="1.3" fill="#E1306C"/>'},
+  facebook:{label:"Facebook",color:"#1877F2",svg:'<circle cx="12" cy="12" r="10" fill="#1877F2"/><text x="12" y="17" font-size="13" fill="#fff" text-anchor="middle" font-family="Arial" font-weight="bold">f</text>'},
+  whatsapp:{label:"WhatsApp",color:"#25D366",svg:'<circle cx="12" cy="12" r="10" fill="#25D366"/><path d="M8 16l1-3a5 5 0 1 1 2 2z" fill="none" stroke="#fff" stroke-width="1.6"/>'},
+  messenger:{label:"Messenger",color:"#0084FF",svg:'<circle cx="12" cy="12" r="10" fill="#0084FF"/><path d="M7 14l3-3 2 2 3-3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'},
+  viber:{label:"Viber",color:"#7360F2",svg:'<circle cx="12" cy="12" r="10" fill="#7360F2"/><path d="M8 16l1-3a5 5 0 1 1 2 2z" fill="none" stroke="#fff" stroke-width="1.6"/>'},
+  telegram:{label:"Telegram",color:"#229ED9",svg:'<circle cx="12" cy="12" r="10" fill="#229ED9"/><path d="M6 12l12-5-5 11-2-5z" fill="#fff"/>'},
+  twitter:{label:"Twitter / X",color:"#111111",svg:'<rect x="3" y="3" width="18" height="18" rx="5" fill="#111"/><text x="12" y="16" font-size="12" fill="#fff" text-anchor="middle" font-family="Arial" font-weight="bold">X</text>'},
+  tiktok:{label:"TikTok",color:"#111111",svg:'<circle cx="12" cy="12" r="10" fill="#111"/><path d="M13 7v7a2.5 2.5 0 1 1-2-2.4" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M13 7c.3 1.6 1.4 2.6 3 2.8" fill="none" stroke="#fff" stroke-width="1.5"/>'},
+  youtube:{label:"YouTube",color:"#FF0000",svg:'<rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><path d="M10 9l6 3-6 3z" fill="#fff"/>'},
+  linkedin:{label:"LinkedIn",color:"#0A66C2",svg:'<rect x="3" y="3" width="18" height="18" rx="4" fill="#0A66C2"/><text x="12" y="16" font-size="9" fill="#fff" text-anchor="middle" font-family="Arial" font-weight="bold">in</text>'},
+  email:{label:"Email",color:"#6B7280",svg:'<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="#6B7280" stroke-width="1.8"/><path d="M4 6l8 7 8-7" fill="none" stroke="#6B7280" stroke-width="1.8"/>'},
+  phone:{label:"Phone",color:"#34A853",svg:'<circle cx="12" cy="12" r="10" fill="#34A853"/><path d="M8 7c0 5 4 9 9 9l1-2-3-1-1 1a7 7 0 0 1-4-4l1-1-1-3z" fill="#fff"/>'},
+  website:{label:"Website",color:"#2E5395",svg:'<circle cx="12" cy="12" r="9" fill="none" stroke="#2E5395" stroke-width="1.8"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="#2E5395" stroke-width="1.4"/>'},
+  github:{label:"GitHub",color:"#181717",svg:'<circle cx="12" cy="12" r="10" fill="#181717"/><text x="12" y="16" font-size="10" fill="#fff" text-anchor="middle" font-family="monospace" font-weight="bold">&lt;/&gt;</text>'}
+};
+
+const DEFAULT_STATE = {
+  name:"Your Name", bio:"Tap a link below to connect with me.",
+  avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", theme:"light",
+  education:"", eduYear:"", eduSection:"", eduLevel:"", work:[],
+  links:[{platform:"instagram",url:"https://instagram.com/yourhandle"},{platform:"email",url:"mailto:you@example.com"}]
+};
+
+let state = JSON.parse(document.getElementById('state-data')?.textContent || JSON.stringify(DEFAULT_STATE));
+let editing = false, isOwner = false, assetsAPI = null, artifactAPI = null;
+
+function linkHref(platform, url){
+  if(platform==="email" && !url.startsWith("mailto:")) return "mailto:"+url;
+  if(platform==="phone" && !url.startsWith("tel:")) return "tel:"+url;
+  if(platform==="whatsapp" && /^\+?\d[\d\s-]+$/.test(url)) return "https://wa.me/"+url.replace(/[^\d]/g,'');
+  return url;
+}
+
+function render(){
+  document.documentElement.setAttribute('data-theme', state.theme||'light');
+  document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
+  document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
+  document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : 'linear-gradient(135deg,#4472C4,#2E5395)';
+  document.getElementById('avatarImg').src = state.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%234472C4"/></svg>';
+  document.getElementById('nameEl').textContent = state.name;
+  document.getElementById('bioEl').textContent = state.bio;
+  const eduParts = [state.eduLevel, state.education, state.eduYear, state.eduSection].filter(Boolean);
+  const eduEl = document.getElementById('eduTag');
+  eduEl.style.setProperty('--tagcolor', state.eduColor || state.accent || '#4472C4');
+  if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
+  const workEl = document.getElementById('workEl');
+  const work = state.work || [];
+  if(work.length){
+    workEl.innerHTML = work.map(w=>`<div class="workrow"><b>${w.role}</b>${w.company?' — '+w.company:''}${w.duration?` <span class="dur">(${w.duration})</span>`:''}</div>`).join('');
+  } else { workEl.innerHTML=''; }
+  const workListEl = document.getElementById('workList');
+  workListEl.innerHTML = work.map((w,i)=>`<div class="worklistitem"><span>${w.role}${w.company?' — '+w.company:''}${w.duration?' ('+w.duration+')':''}</span><span class="rm" data-i="${i}">×</span></div>`).join('');
+  workListEl.querySelectorAll('.rm').forEach(el=> el.onclick = ()=>{ state.work.splice(+el.dataset.i,1); render(); });
+  const linksEl = document.getElementById('linksEl');
+  linksEl.innerHTML = '';
+  state.links.forEach((l,i)=>{
+    const meta = ICONS[l.platform] || ICONS.website;
+    const row = document.createElement(editing ? 'div' : 'a');
+    row.className='linkbtn';
+    if(!editing){ row.href = linkHref(l.platform, l.url); row.target='_blank'; row.rel='noopener'; }
+    row.innerHTML = `<svg viewBox="0 0 24 24">${meta.svg}</svg><span>${meta.label}</span>`;
+    if(editing){
+      const rm = document.createElement('span');
+      rm.className='rm'; rm.textContent='×';
+      rm.onclick = ()=>{ state.links.splice(i,1); render(); };
+      row.appendChild(rm);
+    }
+    linksEl.appendChild(row);
+  });
+  document.getElementById('nameEl').contentEditable = editing;
+  document.getElementById('bioEl').contentEditable = editing;
+  document.getElementById('editPanel').classList.toggle('hidden', !editing);
+  document.getElementById('opRange').value = Math.round((state.coverOpacity ?? 0.55)*100);
+  document.getElementById('accentPick').value = state.accent || '#4472C4';
+  document.getElementById('eduSchool').value = state.education || '';
+  document.getElementById('eduYear').value = state.eduYear || '';
+  document.getElementById('eduSection').value = state.eduSection || '';
+  document.getElementById('eduLevel').value = state.eduLevel || '';
+  document.getElementById('eduColorPick').value = state.eduColor || state.accent || '#4472C4';
+}
+
+function populatePlatforms(){
+  const sel = document.getElementById('platformSel');
+  sel.innerHTML = Object.entries(ICONS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
+}
+
+function toDataUrl(file, cb){
+  const r = new FileReader();
+  r.onload = ()=>cb(r.result);
+  r.readAsDataURL(file);
+}
+
+async function buildHtmlWithState(){
+  const resp = await fetch(window.location.href).catch(()=>null);
+  let base = resp ? await resp.text() : document.documentElement.outerHTML;
+  const json = JSON.stringify(state).replace(/</g,'\\u003c');
+  if(base.includes('id="state-data"')){
+    base = base.replace(/<script id="state-data"[^>]*>[\s\S]*?<\/script>/, `<script id="state-data" type="application/json">${json}<\/script>`);
+  } else {
+    base = base.replace('</body>', `<script id="state-data" type="application/json">${json}<\/script></body>`);
+  }
+  return base;
+}
+
+// NFC Card Linking & Authentication Logic Integration
+async function handleNfcCardBinding() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const cardUid = urlParams.get('card');
+  if (!cardUid) return;
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    // Not logged in: Trigger Google OAuth Login redirect back with card query
+    await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.href }
+    });
+  } else {
+    // Logged in: Check card binding status in nfc_cards table
+    const { data: cardRecord, error: fetchError } = await supabaseClient
+      .from('nfc_cards')
+      .select('*')
+      .eq('nfc_uid', cardUid)
+      .single();
+
+    if (cardRecord && !cardRecord.nfc_uid) { // Or check if nfc_user / user mapping field is empty
+      // Bind the card to the current authenticated user if not already bound
+      await supabaseClient
+        .from('nfc_cards')
+        .update({ nfc_uid: cardUid }) // Adjust update fields as appropriate for your schema mapping
+        .eq('nfc_uid', cardUid);
+    }
+    
+    // Automatically reveal edit controls for the verified owner of the card session
+    isOwner = true;
+    document.getElementById('editFab').classList.remove('hidden');
+  }
+}
+
+async function init(){
+  populatePlatforms();
+  render();
+
+  // Execute NFC Card Binding flow on load
+  await handleNfcCardBinding().catch(console.error);
+
+  document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
+  document.getElementById('bioEl').addEventListener('input', e=> state.bio = e.target.textContent);
+  document.getElementById('opRange').addEventListener('input', e=>{ state.coverOpacity = e.target.value/100; render(); });
+  document.getElementById('accentPick').addEventListener('input', e=>{ state.accent = e.target.value; render(); });
+  document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
+  document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
+  document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
+  document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
+  document.getElementById('eduColorPick').addEventListener('input', e=>{ state.eduColor = e.target.value; render(); });
+  document.getElementById('addWorkBtn').addEventListener('click', ()=>{
+    const role = document.getElementById('workRole').value.trim();
+    const company = document.getElementById('workCompany').value.trim();
+    const duration = document.getElementById('workDuration').value.trim();
+    if(!role) return;
+    state.work = state.work || [];
+    state.work.push({role, company, duration});
+    document.getElementById('workRole').value='';
+    document.getElementById('workCompany').value='';
+    document.getElementById('workDuration').value='';
+    render();
+  });
+  document.getElementById('addLinkBtn').addEventListener('click', ()=>{
+    const platform = document.getElementById('platformSel').value;
+    const url = document.getElementById('linkUrl').value.trim();
+    if(!url) return;
+    state.links.push({platform, url});
+    document.getElementById('linkUrl').value='';
+    render();
+  });
+  document.getElementById('avatarFile').addEventListener('change', async e=>{
+    const file = e.target.files[0]; if(!file) return;
+    if(assetsAPI){ try{ const up = await assetsAPI.upload(file); state.avatar = up.url; render(); return; }catch(_e){} }
+    toDataUrl(file, url=>{ state.avatar = url; render(); });
+  });
+  document.getElementById('coverFile').addEventListener('change', async e=>{
+    const file = e.target.files[0]; if(!file) return;
+    if(assetsAPI){ try{ const up = await assetsAPI.upload(file); state.cover = up.url; render(); return; }catch(_e){} }
+    toDataUrl(file, url=>{ state.cover = url; render(); });
+  });
+  document.getElementById('doneBtn').addEventListener('click', ()=>{ editing=false; render(); });
+  document.getElementById('saveBtn').addEventListener('click', async ()=>{
+    const statusEl = document.getElementById('statusEl');
+    if(!artifactAPI){ statusEl.textContent='Preview mode only (owner tools not connected here).'; return; }
+    statusEl.textContent='Publishing...';
+    try{
+      const html = await buildHtmlWithState();
+      await artifactAPI.publish(html);
+      statusEl.textContent='Saved. This page is now live for anyone with the link.';
+    }catch(err){ statusEl.textContent='Could not save: '+(err?.message||'try again'); }
+  });
+  document.getElementById('editFab').addEventListener('click', ()=>{ editing = !editing; render(); });
+
+  // Owner / platform tools light up asynchronously -- page already works without them
+  try{
+    const user = await claude.use("user");
+    isOwner = !!(user && user.isOwner && user.isOwner());
+    if(isOwner) document.getElementById('editFab').classList.remove('hidden');
+  }catch(_e){}
+  try{ artifactAPI = await claude.use("artifact"); }catch(_e){}
+  try{ assetsAPI = await claude.use("assets"); }catch(_e){}
+}
+init();
+</script>
+</body>
+</html>
