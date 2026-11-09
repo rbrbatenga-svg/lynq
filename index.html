@@ -32,7 +32,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
   box-shadow:0 6px 24px rgba(0,0,0,.12);width:100%; z-index:5;}
 
-/* Header layout: Profile photo on left, Share button & Info button next to it, Gallery button on right */
 .avatar-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-70px;margin-bottom:12px;}
 .avatar-left-group{display:flex;align-items:flex-end;gap:8px;}
 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
@@ -59,7 +58,6 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
 
-/* Links Layout Styles */
 .links.list-layout{display:flex;flex-direction:column;gap:10px;}
 .links.list-layout .linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--card);
   text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.2);width:100%;}
@@ -98,7 +96,6 @@ input[type=range]{flex:1;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 
-/* Sign-in prompt & Bottom Switch Account Link */
 .auth-prompt{
   font-size:13px; color:var(--sub); text-align:center; margin-top:20px; display:block; position:relative; z-index:10;
 }
@@ -136,7 +133,6 @@ input[type=range]{flex:1;}
 .loader-text {
   font-size: 12px; font-weight: 500; color: var(--sub);
 }
-/* Moving ellipsis animation */
 .loader-text::after {
   content: '';
   animation: ellipsis 1.5s infinite;
@@ -157,7 +153,6 @@ input[type=range]{flex:1;}
   max-height: 250px; opacity: 1; margin-top: 10px;
 }
 
-/* Theme Presets Selection Grid */
 .theme-grid {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; margin-top: 4px;
 }
@@ -168,7 +163,6 @@ input[type=range]{flex:1;}
   width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.15);
 }
 
-/* Modal Popup for Photos Gallery & Info Guide */
 .modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s ease;
 }
@@ -192,24 +186,6 @@ input[type=range]{flex:1;}
   color: var(--text); font-size: 14px; margin: 12px 0 4px;
 }
 </style>
-<script>
-  const THEMES = {
-    'clean-light': { bg:'#f4f5f7', card:'#ffffff', text:'#1a1a1a', sub:'#555555', accent:'#4472C4', cover:'linear-gradient(135deg,#4472C4,#2E5395)' },
-    'black-gray': { bg:'#121212', card:'#1e1e1e', text:'#f1f1f1', sub:'#a0a0a0', accent:'#888888', cover:'linear-gradient(135deg,#242424,#0d0d0d)' },
-    'white-pink': { bg:'#fff0f5', card:'#ffffff', text:'#2d132c', sub:'#6b4c68', accent:'#d81b60', cover:'linear-gradient(135deg,#ff80bf,#ffb3d9)' },
-    'white-black': { bg:'#f8fafc', card:'#ffffff', text:'#0f172a', sub:'#475569', accent:'#0f172a', cover:'linear-gradient(135deg,#334155,#0f172a)' },
-    'lgbt-pride': { bg:'#1a1025', card:'#261836', text:'#ffffff', sub:'#d8b4fe', accent:'#ec4899', cover:'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7)' },
-    'midnight-blue': { bg:'#090d16', card:'#111827', text:'#f3f4f6', sub:'#9ca3af', accent:'#3b82f6', cover:'linear-gradient(135deg,#1e40af,#1e1b4b)' },
-    'emerald-dark': { bg:'#061a14', card:'#0f2922', text:#ecfdf5', sub:'#6ee7b7', accent:'#10b981', cover:'linear-gradient(135deg,#047857,#064e3b)' },
-    'sunset-amber': { bg:'#1c120c', card:'#2b1c14', text:'#fffbeb', sub:'#fde68a', accent:'#f59e0b', cover:'linear-gradient(135deg,#d97706,#b45309)' }
-  };
-
-  (function() {
-    const savedKey = localStorage.getItem('lynq_theme_key') || 'clean-light';
-    const t = THEMES[savedKey] || THEMES['clean-light'];
-    document.documentElement.style.setProperty('--bg', t.bg);
-  })();
-</script>
 </head>
 <body>
 
@@ -226,7 +202,6 @@ input[type=range]{flex:1;}
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
   <div class="card" id="mainCardEl">
-    <!-- Header Row: Profile Photo on Left, Share Button & Info Button Next to It, Gallery Button on Right -->
     <div class="avatar-row">
       <div class="avatar-left-group">
         <img class="avatar" id="avatarImg" src="" alt="">
@@ -353,11 +328,9 @@ input[type=range]{flex:1;}
     <button class="btn secondary" id="closeInboxBtn" style="margin-top:12px;">Close Inbox</button>
   </div>
 
-  <!-- Switch Account Hyperlink (Visible for Owners at bottom middle) -->
   <a class="switch-account-link hidden" id="switchAccountBtn">Switch to different LYNQ account</a>
 </div>
 
-<!-- Modal Popup Container for Gallery -->
 <div class="modal-overlay" id="galleryModal">
   <div class="modal-body">
     <span class="modal-close" id="closeGalleryBtn">&times;</span>
@@ -366,7 +339,6 @@ input[type=range]{flex:1;}
   </div>
 </div>
 
-<!-- Modal Popup Container for Info Guide -->
 <div class="modal-overlay" id="infoModal">
   <div class="modal-body">
     <span class="modal-close" id="closeInfoBtn">&times;</span>
@@ -392,6 +364,24 @@ input[type=range]{flex:1;}
 </button>
 
 <script>
+// THEMES defined strictly at the top so it is available globally
+const THEMES = {
+  'clean-light': { bg:'#f4f5f7', card:'#ffffff', text:'#1a1a1a', sub:'#555555', accent:'#4472C4', cover:'linear-gradient(135deg,#4472C4,#2E5395)' },
+  'black-gray': { bg:'#121212', card:'#1e1e1e', text:'#f1f1f1', sub:'#a0a0a0', accent:'#888888', cover:'linear-gradient(135deg,#242424,#0d0d0d)' },
+  'white-pink': { bg:'#fff0f5', card:'#ffffff', text:'#2d132c', sub:'#6b4c68', accent:'#d81b60', cover:'linear-gradient(135deg,#ff80bf,#ffb3d9)' },
+  'white-black': { bg:'#f8fafc', card:'#ffffff', text:'#0f172a', sub:'#475569', accent:'#0f172a', cover:'linear-gradient(135deg,#334155,#0f172a)' },
+  'lgbt-pride': { bg:'#1a1025', card:'#261836', text:'#ffffff', sub:'#d8b4fe', accent:'#ec4899', cover:'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7)' },
+  'midnight-blue': { bg:'#090d16', card:'#111827', text:'#f3f4f6', sub:'#9ca3af', accent:'#3b82f6', cover:'linear-gradient(135deg,#1e40af,#1e1b4b)' },
+  'emerald-dark': { bg:'#061a14', card:'#0f2922', text:'#ecfdf5', sub:'#6ee7b7', accent:'#10b981', cover:'linear-gradient(135deg,#047857,#064e3b)' },
+  'sunset-amber': { bg:'#1c120c', card:'#2b1c14', text:'#fffbeb', sub:'#fde68a', accent:'#f59e0b', cover:'linear-gradient(135deg,#d97706,#b45309)' }
+};
+
+(function() {
+  const savedKey = localStorage.getItem('lynq_theme_key') || 'clean-light';
+  const t = THEMES[savedKey] || THEMES['clean-light'];
+  document.documentElement.style.setProperty('--bg', t.bg);
+})();
+
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__ViFzG_-avROzL-oRvc1lg_bn8dmo9e';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -744,7 +734,6 @@ async function init(){
     }
   });
 
-  // Info modal controls
   document.getElementById('infoBtn').addEventListener('click', () => {
     document.getElementById('infoModal').classList.add('open');
   });
