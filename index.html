@@ -32,7 +32,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
   box-shadow:0 6px 24px rgba(0,0,0,.12);width:100%; z-index:5;}
 
-/* Header layout: Share button on left, Profile photo & Gallery button on right */
+/* Header layout: Profile photo on left, Share button next to it, Gallery button on opposite side */
 .avatar-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-70px;margin-bottom:12px;}
 .avatar-left-group{display:flex;align-items:flex-end;gap:10px;}
 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
@@ -136,6 +136,18 @@ input[type=range]{flex:1;}
 .loader-text {
   font-size: 12px; font-weight: 500; color: var(--sub);
 }
+/* Moving ellipsis animation */
+.loader-text::after {
+  content: '';
+  animation: ellipsis 1.5s infinite;
+}
+@keyframes ellipsis {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: ''; }
+}
 
 .note-drawer {
   max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out, opacity 0.25s ease;
@@ -201,20 +213,20 @@ input[type=range]{flex:1;}
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       LYNQ
     </div>
-    <div class="loader-text" id="loaderTextEl">Please tap the LYNQ Card</div>
+    <div class="loader-text" id="loaderTextEl">Loading information, please wait</div>
   </div>
 </div>
 
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
   <div class="card" id="mainCardEl">
-    <!-- Header Row: Share Button on Left, Avatar & Gallery Button on Right -->
+    <!-- Header Row: Profile Photo on Left, Share Button Next to It, Gallery Button on Right -->
     <div class="avatar-row">
       <div class="avatar-left-group">
+        <img class="avatar" id="avatarImg" src="" alt="">
         <button class="share-btn" id="shareBtn" title="Share Portfolio">
           <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </button>
-        <img class="avatar" id="avatarImg" src="" alt="">
       </div>
       <button class="gallery-btn hidden" id="openGalleryBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -598,7 +610,10 @@ async function handleNfcCardBinding() {
   }
 
   if (!cardUid) {
-    document.getElementById('loaderTextEl').textContent = "Please tap the LYNQ Card";
+    showError("Missing card parameter in URL. Please tap a valid LYNQ card.");
+    const loader = document.getElementById('loadingScreen');
+    if(loader) loader.style.opacity = '0';
+    setTimeout(() => loader?.remove(), 300);
     return;
   }
   currentCardUid = cardUid;
@@ -683,7 +698,6 @@ async function init(){
     if(loader) loader.remove();
   });
 
-  // Share Button Action (uses Web Share API or falls back to clipboard copy)
   document.getElementById('shareBtn').addEventListener('click', async () => {
     const shareData = {
       title: state.name ? `${state.name}'s LYNQ Profile` : 'LYNQ Profile',
