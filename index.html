@@ -41,7 +41,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 h1{font-size:22px;margin:8px 0 4px;color:var(--text);}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
-.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 10px;}
+.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 6px;}
+.infotag{display:inline-block;font-size:12px;font-weight:500;color:var(--text);background:rgba(127,127,127,0.1);border-radius:999px;padding:5px 12px;margin:0 4px 6px 0;}
+
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.2);background:var(--card);color:var(--text);}
 .contact-btn svg{width:14px;height:14px;flex:none;}
@@ -169,7 +171,6 @@ input[type=range]{flex:1;}
 }
 </style>
 <script>
-  // High-contrast predefined themes guaranteeing clear text and SVG contrast
   const THEMES = {
     'clean-light': { bg:'#f4f5f7', card:'#ffffff', text:'#1a1a1a', sub:'#555555', accent:'#4472C4', cover:'linear-gradient(135deg,#4472C4,#2E5395)' },
     'black-gray': { bg:'#121212', card:'#1e1e1e', text:'#f1f1f1', sub:'#a0a0a0', accent:'#888888', cover:'linear-gradient(135deg,#242424,#0d0d0d)' },
@@ -196,7 +197,7 @@ input[type=range]{flex:1;}
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       LYNQ
     </div>
-    <div class="loader-text">Loading information, please wait</div>
+    <div class="loader-text" id="loaderTextEl">Loading information, please wait</div>
   </div>
 </div>
 
@@ -217,6 +218,7 @@ input[type=range]{flex:1;}
     <div class="worklocation" id="workLocationEl"></div>
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
+    <div id="extraTagsContainer"></div>
     <div class="contact-row" id="contactRow"></div>
 
     <div class="links list-layout" id="linksEl"></div>
@@ -279,6 +281,10 @@ input[type=range]{flex:1;}
     <div class="row"><label>School/Course</label><input type="text" id="eduSchool" placeholder="e.g. BS Computer Science"></div>
     <div class="row"><label>Year</label><input type="text" id="eduYear" placeholder="e.g. 3rd Year"></div>
     <div class="row"><label>Section</label><input type="text" id="eduSection" placeholder="optional, e.g. Section A"></div>
+
+    <h3 style="margin-top:18px;">Languages &amp; Hobbies (optional)</h3>
+    <div class="row"><label>Languages</label><input type="text" id="languagesInput" placeholder="e.g. English, Tagalog, Bahasa Indonesia"></div>
+    <div class="row"><label>Hobbies</label><input type="text" id="hobbiesInput" placeholder="e.g. Martial arts, Gaming, Reading"></div>
 
     <h3 style="margin-top:18px;">Direct Contact Info</h3>
     <div class="row"><label>Phone Number</label><input type="text" id="phoneInput" placeholder="e.g. +639123456789"></div>
@@ -360,7 +366,7 @@ const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, themeKey:"clean-light",
   layoutStyle:"list", photos:[], workCityCountry:"",
-  education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
+  education:"", eduYear:"", eduSection:"", eduLevel:"", languages:"", hobbies:"", phone:"", email:"", work:[],
   links:[]
 };
 
@@ -438,6 +444,17 @@ function render(){
   eduEl.style.setProperty('--tagcolor', t.accent);
   if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
   
+  // Render Languages & Hobbies extra tags
+  const extraContainer = document.getElementById('extraTagsContainer');
+  let extraHtml = '';
+  if (state.languages) {
+    extraHtml += `<div class="infotag">Languages: ${state.languages}</div>`;
+  }
+  if (state.hobbies) {
+    extraHtml += `<div class="infotag">Hobbies: ${state.hobbies}</div>`;
+  }
+  extraContainer.innerHTML = extraHtml;
+
   const contactRow = document.getElementById('contactRow');
   let contactHtml = '';
   if(state.phone) {
@@ -510,6 +527,8 @@ function render(){
   document.getElementById('eduYear').value = state.eduYear || '';
   document.getElementById('eduSection').value = state.eduSection || '';
   document.getElementById('eduLevel').value = state.eduLevel || '';
+  document.getElementById('languagesInput').value = state.languages || '';
+  document.getElementById('hobbiesInput').value = state.hobbies || '';
   document.getElementById('phoneInput').value = state.phone || '';
   document.getElementById('emailInput').value = state.email || '';
 
@@ -567,8 +586,7 @@ async function handleNfcCardBinding() {
   const cardUid = urlParams.get('card');
   
   if (!cardUid) {
-    showError("Missing ?card= parameter in URL.");
-    render();
+    document.getElementById('loaderTextEl').textContent = "Please tap the LYNQ Card";
     return;
   }
   currentCardUid = cardUid;
@@ -687,6 +705,8 @@ async function init(){
   document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
   document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
   document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
+  document.getElementById('languagesInput').addEventListener('input', e=>{ state.languages = e.target.value; render(); });
+  document.getElementById('hobbiesInput').addEventListener('input', e=>{ state.hobbies = e.target.value; render(); });
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
   document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
