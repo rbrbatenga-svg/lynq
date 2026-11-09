@@ -20,10 +20,10 @@
 }
 :root[data-theme="dark"]{ --bg:#111214; --card:#1b1c1f; --text:#f2f2f2; --sub:#9a9a9a; color-scheme: dark; }
 *{box-sizing:border-box;}
-html,body{margin:0;height:100%;}
+html,body{margin:0;height:100%; background:var(--bg); color:var(--text);}
 body{
   font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:var(--bg); color:var(--text); min-height:100%;
+  min-height:100%;
 }
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);}
 .cover{position:relative;height:220px;background-size:cover;background-position:center;overflow:hidden;}
@@ -35,7 +35,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   margin-top:-70px;display:block;background:var(--accent);}
 h1{font-size:22px;margin:12px 0 4px;}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
-.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 16px;}
+.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 10px;}
+.contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.2);background:var(--bg);color:var(--text);}
+.contact-btn svg{width:14px;height:14px;flex:none;}
 .work{margin:2px 0 14px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
 .workrow .dur{color:var(--sub);font-size:12px;}
@@ -50,22 +53,34 @@ h1{font-size:22px;margin:12px 0 4px;}
 .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);
   color:#fff;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:14px;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;}
+.inbox-fab{position:fixed;right:84px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#333;
+  color:#fff;border:none;border-radius:999px;padding:12px 14px;font-weight:700;font-size:14px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;display:flex;align-items:center;gap:6px;}
 .panel{background:var(--card);border-radius:14px;padding:16px;margin-top:16px;border:1px solid rgba(127,127,127,.15);}
 .panel h3{margin:0 0 10px;font-size:14px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;}
 .row{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
 .row label{font-size:13px;color:var(--sub);min-width:80px;}
-input[type=text],input[type=url],select{flex:1;padding:9px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.3);
+input[type=text],input[type=url],textarea,select{flex:1;padding:9px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.3);
   background:var(--bg);color:var(--text);font-size:14px;min-width:120px;}
+textarea{width:100%;resize:vertical;min-height:70px;}
 input[type=range]{flex:1;}
 input[type=color]{width:44px;height:34px;border:none;background:none;}
 .btn{padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:600;
   font-size:13px;cursor:pointer;}
 .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.note-section{margin-top:24px;border-top:1px solid rgba(127,127,127,.15);padding-top:16px;}
 .note{font-size:12px;color:var(--sub);margin-top:4px;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 .auth-prompt{font-size:13px;color:var(--accent);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;display:block;}
 </style>
+<script>
+  // Instant theme apply to prevent dark flash on load
+  (function() {
+    const savedTheme = localStorage.getItem('lynq_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  })();
+</script>
 </head>
 <body>
 
@@ -77,9 +92,18 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="work" id="workEl"></div>
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
+    <div class="contact-row" id="contactRow"></div>
     <div class="links" id="linksEl"></div>
+
+    <div class="note-section" id="visitorNoteSection">
+      <h3>Leave a note for the owner</h3>
+      <textarea id="visitorNoteText" placeholder="Write a quick message or note..."></textarea>
+      <button class="btn" id="sendNoteBtn" style="margin-top:8px;">Send Note</button>
+      <div class="status" id="noteStatusEl" style="color:var(--sub)"></div>
+    </div>
+
     <div class="status" id="globalErrorEl"></div>
-    <a class="auth-prompt hidden" id="authPromptBtn">Already own this card? Sign in...</a>
+    <a class="auth-prompt hidden" id="authPromptBtn">Have a LYNQ card already? Sign in</a>
   </div>
 
   <div class="panel hidden" id="editPanel">
@@ -96,6 +120,10 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="row"><label>School/Course</label><input type="text" id="eduSchool" placeholder="e.g. BS Computer Science"></div>
     <div class="row"><label>Year</label><input type="text" id="eduYear" placeholder="e.g. 3rd Year"></div>
     <div class="row"><label>Section</label><input type="text" id="eduSection" placeholder="optional, e.g. Section A"></div>
+
+    <h3 style="margin-top:18px;">Direct Contact Info</h3>
+    <div class="row"><label>Phone Number</label><input type="text" id="phoneInput" placeholder="e.g. +639123456789"></div>
+    <div class="row"><label>Email Address</label><input type="text" id="emailInput" placeholder="e.g. name@example.com"></div>
 
     <h3 style="margin-top:18px;">Work Experience (optional)</h3>
     <div id="workList"></div>
@@ -119,12 +147,18 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     </div>
     <div class="status" id="statusEl" style="color:var(--sub)"></div>
   </div>
+
+  <div class="panel hidden" id="inboxPanel">
+    <h3>📥 Visitor Notes Inbox</h3>
+    <div id="notesListContainer" style="font-size:13px; color:var(--sub);">No notes yet.</div>
+    <button class="btn secondary" id="closeInboxBtn" style="margin-top:12px;">Close Inbox</button>
+  </div>
 </div>
 
 <button class="fab hidden" id="editFab">Edit</button>
+<button class="inbox-fab hidden" id="inboxFab">📥 Inbox <span id="inboxCount">0</span></button>
 
 <script>
-// Supabase Configuration
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__ViFzG_-avROzL-oRvc1lg_bn8dmo9e';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -140,8 +174,6 @@ const ICONS = {
   tiktok:{label:"TikTok",color:"#111111",svg:'<circle cx="12" cy="12" r="10" fill="#111"/><path d="M13 7v7a2.5 2.5 0 1 1-2-2.4" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M13 7c.3 1.6 1.4 2.6 3 2.8" fill="none" stroke="#fff" stroke-width="1.5"/>'},
   youtube:{label:"YouTube",color:"#FF0000",svg:'<rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><path d="M10 9l6 3-6 3z" fill="#fff"/>'},
   linkedin:{label:"LinkedIn",color:"#0A66C2",svg:'<rect x="3" y="3" width="18" height="18" rx="4" fill="#0A66C2"/><text x="12" y="16" font-size="9" fill="#fff" text-anchor="middle" font-family="Arial" font-weight="bold">in</text>'},
-  email:{label:"Email",color:"#6B7280",svg:'<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="#6B7280" stroke-width="1.8"/><path d="M4 6l8 7 8-7" fill="none" stroke="#6B7280" stroke-width="1.8"/>'},
-  phone:{label:"Phone",color:"#34A853",svg:'<circle cx="12" cy="12" r="10" fill="#34A853"/><path d="M8 7c0 5 4 9 9 9l1-2-3-1-1 1a7 7 0 0 1-4-4l1-1-1-3z" fill="#fff"/>'},
   website:{label:"Website",color:"#2E5395",svg:'<circle cx="12" cy="12" r="9" fill="none" stroke="#2E5395" stroke-width="1.8"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="#2E5395" stroke-width="1.4"/>'},
   github:{label:"GitHub",color:"#181717",svg:'<circle cx="12" cy="12" r="10" fill="#181717"/><text x="12" y="16" font-size="10" fill="#fff" text-anchor="middle" font-family="monospace" font-weight="bold">&lt;/&gt;</text>'}
 };
@@ -149,7 +181,7 @@ const ICONS = {
 const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", theme:"light",
-  education:"", eduYear:"", eduSection:"", eduLevel:"", work:[],
+  education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
   links:[]
 };
 
@@ -160,40 +192,46 @@ function showError(msg) {
   document.getElementById('globalErrorEl').textContent = msg;
 }
 
-function linkHref(platform, url){
-  if(platform==="email" && !url.startsWith("mailto:")) return "mailto:"+url;
-  if(platform==="phone" && !url.startsWith("tel:")) return "tel:"+url;
-  if(platform==="whatsapp" && /^\+?\d[\d\s-]+$/.test(url)) return "https://wa.me/"+url.replace(/[^\d]/g,'');
-  return url;
-}
-
 function render(){
-  document.documentElement.setAttribute('data-theme', state.theme||'light');
   document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
   document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
   document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : 'linear-gradient(135deg,#4472C4,#2E5395)';
   document.getElementById('avatarImg').src = state.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%234472C4"/></svg>';
   document.getElementById('nameEl').textContent = state.name;
   document.getElementById('bioEl').textContent = state.bio;
+  
   const eduParts = [state.eduLevel, state.education, state.eduYear, state.eduSection].filter(Boolean);
   const eduEl = document.getElementById('eduTag');
   eduEl.style.setProperty('--tagcolor', state.eduColor || state.accent || '#4472C4');
   if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
+  
+  const contactRow = document.getElementById('contactRow');
+  let contactHtml = '';
+  if(state.phone) {
+    contactHtml += `<a class="contact-btn" href="tel:${state.phone}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call</a>`;
+  }
+  if(state.email) {
+    contactHtml += `<a class="contact-btn" href="mailto:${state.email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg> Email</a>`;
+  }
+  contactRow.innerHTML = contactHtml;
+
   const workEl = document.getElementById('workEl');
   const work = state.work || [];
   if(work.length){
     workEl.innerHTML = work.map(w=>`<div class="workrow"><b>${w.role}</b>${w.company?' — '+w.company:''}${w.duration?` <span class="dur">(${w.duration})</span>`:''}</div>`).join('');
   } else { workEl.innerHTML=''; }
+
   const workListEl = document.getElementById('workList');
   workListEl.innerHTML = work.map((w,i)=>`<div class="worklistitem"><span>${w.role}${w.company?' — '+w.company:''}${w.duration?' ('+w.duration+')':''}</span><span class="rm" data-i="${i}">×</span></div>`).join('');
   workListEl.querySelectorAll('.rm').forEach(el=> el.onclick = ()=>{ state.work.splice(+el.dataset.i,1); render(); });
+
   const linksEl = document.getElementById('linksEl');
   linksEl.innerHTML = '';
   state.links.forEach((l,i)=>{
     const meta = ICONS[l.platform] || ICONS.website;
     const row = document.createElement(editing ? 'div' : 'a');
     row.className='linkbtn';
-    if(!editing){ row.href = linkHref(l.platform, l.url); row.target='_blank'; row.rel='noopener'; }
+    if(!editing){ row.href = l.url; row.target='_blank'; row.rel='noopener'; }
     row.innerHTML = `<svg viewBox="0 0 24 24">${meta.svg}</svg><span>${meta.label}</span>`;
     if(editing){
       const rm = document.createElement('span');
@@ -203,6 +241,7 @@ function render(){
     }
     linksEl.appendChild(row);
   });
+
   document.getElementById('nameEl').contentEditable = editing;
   document.getElementById('bioEl').contentEditable = editing;
   document.getElementById('editPanel').classList.toggle('hidden', !editing);
@@ -213,6 +252,8 @@ function render(){
   document.getElementById('eduSection').value = state.eduSection || '';
   document.getElementById('eduLevel').value = state.eduLevel || '';
   document.getElementById('eduColorPick').value = state.eduColor || state.accent || '#4472C4';
+  document.getElementById('phoneInput').value = state.phone || '';
+  document.getElementById('emailInput').value = state.email || '';
 }
 
 function populatePlatforms(){
@@ -224,6 +265,25 @@ function toDataUrl(file, cb){
   const r = new FileReader();
   r.onload = ()=>cb(r.result);
   r.readAsDataURL(file);
+}
+
+async function fetchInboxNotes() {
+  if (!currentCardUid) return;
+  const { data, error } = await supabaseClient
+    .from('card_notes')
+    .select('*')
+    .eq('card_uid', currentCardUid)
+    .order('created_at', { ascending: false });
+
+  if (!error && data) {
+    const container = document.getElementById('notesListContainer');
+    document.getElementById('inboxCount').textContent = data.length;
+    if (data.length === 0) {
+      container.innerHTML = 'No notes yet.';
+      return;
+    }
+    container.innerHTML = data.map(n => `<div style="padding:8px 0; border-bottom:1px solid rgba(127,127,127,.15);"><b>${n.visitor_email || 'Anonymous'}</b><div style="font-size:14px; color:var(--text); margin-top:2px;">${n.message}</div><div style="font-size:11px; color:var(--sub); margin-top:2px;">${new Date(n.created_at).toLocaleString()}</div></div>`).join('');
+  }
 }
 
 async function handleNfcCardBinding() {
@@ -274,6 +334,9 @@ async function handleNfcCardBinding() {
     if (session && session.user.id === cardRecord.user_id) {
       isOwner = true;
       document.getElementById('editFab').classList.remove('hidden');
+      document.getElementById('inboxFab').classList.remove('hidden');
+      document.getElementById('visitorNoteSection').classList.add('hidden');
+      fetchInboxNotes();
     }
   } else {
     if (session) {
@@ -285,6 +348,9 @@ async function handleNfcCardBinding() {
       if (!updateErr) {
         isOwner = true;
         document.getElementById('editFab').classList.remove('hidden');
+        document.getElementById('inboxFab').classList.remove('hidden');
+        document.getElementById('visitorNoteSection').classList.add('hidden');
+        fetchInboxNotes();
       } else {
         showError("Failed to claim card: " + updateErr.message);
       }
@@ -314,6 +380,8 @@ async function init(){
   document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
   document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
   document.getElementById('eduColorPick').addEventListener('input', e=>{ state.eduColor = e.target.value; render(); });
+  document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
+  document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
   document.getElementById('addWorkBtn').addEventListener('click', ()=>{
     const role = document.getElementById('workRole').value.trim();
@@ -369,7 +437,44 @@ async function init(){
     }
   });
 
-  document.getElementById('editFab').addEventListener('click', ()=>{ editing = !editing; render(); });
+  document.getElementById('editFab').addEventListener('click', ()=>{ 
+    editing = !editing; 
+    document.getElementById('inboxPanel').classList.add('hidden');
+    render(); 
+  });
+
+  document.getElementById('inboxFab').addEventListener('click', ()=>{
+    editing = false;
+    render();
+    const panel = document.getElementById('inboxPanel');
+    panel.classList.toggle('hidden');
+    fetchInboxNotes();
+  });
+
+  document.getElementById('closeInboxBtn').addEventListener('click', ()=>{
+    document.getElementById('inboxPanel').classList.add('hidden');
+  });
+
+  document.getElementById('sendNoteBtn').addEventListener('click', async ()=>{
+    const msg = document.getElementById('visitorNoteText').value.trim();
+    const noteStatus = document.getElementById('noteStatusEl');
+    if(!msg) { noteStatus.textContent='Please write a message first.'; return; }
+    
+    noteStatus.textContent='Sending note...';
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const visitorEmail = session?.user?.email || 'Anonymous Visitor';
+
+    const { error } = await supabaseClient
+      .from('card_notes')
+      .insert({ card_uid: currentCardUid, message: msg, visitor_email: visitorEmail });
+
+    if(error) {
+      noteStatus.textContent='Failed to send: ' + error.message;
+    } else {
+      noteStatus.textContent='Note sent successfully!';
+      document.getElementById('visitorNoteText').value='';
+    }
+  });
 }
 
 init();
