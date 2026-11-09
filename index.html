@@ -64,6 +64,7 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .note{font-size:12px;color:var(--sub);margin-top:4px;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:var(--sub);text-align:center;margin-top:10px;}
+.auth-prompt{font-size:13px;color:var(--sub);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -77,6 +78,7 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
     <div class="links" id="linksEl"></div>
+    <div class="auth-prompt hidden" id="authPromptBtn">Already own a card already? Sign in...</div>
   </div>
 
   <div class="panel hidden" id="editPanel">
@@ -220,7 +222,6 @@ function toDataUrl(file, cb){
   r.readAsDataURL(file);
 }
 
-// Database Integration: Load and Save Profile State via Supabase
 async function loadCardData(cardUid) {
   const { data: cardRecord, error } = await supabaseClient
     .from('nfc_cards')
@@ -228,17 +229,17 @@ async function loadCardData(cardUid) {
     .eq('nfc_uid', cardUid)
     .single();
 
-  if (cardRecord && cardRecord.bio) {
-    // If you store the JSON profile payload in bio or another column, parse it here
-    try {
-      const parsed = JSON.parse(cardRecord.bio);
-      if (parsed && typeof parsed === 'object') {
-        state = { ...DEFAULT_STATE, ...parsed };
+  if (cardRecord) {
+    if (cardRecord.bio) {
+      try {
+        const parsed = JSON.parse(cardRecord.bio);
+        if (parsed && typeof parsed === 'object') {
+          state = { ...DEFAULT_STATE, ...parsed };
+        }
+      } catch (_e) {
+        state.bio = cardRecord.bio;
+        if (cardRecord.card_title) state.name = cardRecord.card_title;
       }
-    } catch (_e) {
-      // Fallback if bio column holds raw string
-      state.bio = cardRecord.bio;
-      if (cardRecord.card_title) state.name = cardRecord.card_title;
     }
   }
 }
@@ -258,14 +259,12 @@ async function saveCardData() {
   if (error) throw error;
 }
 
-// Single-Login & Database-Backed Binding Flow
 async function handleNfcCardBinding() {
   const urlParams = new URLSearchParams(window.location.search);
   const cardUid = urlParams.get('card');
   if (!cardUid) return;
   currentCardUid = cardUid;
 
-  // 1. Fetch card record from database
   const { data: cardRecord, error } = await supabaseClient
     .from('nfc_cards')
     .select('*')
@@ -274,38 +273,36 @@ async function handleNfcCardBinding() {
 
   if (!cardRecord) return;
 
-  // Load existing profile contents into state
   await loadCardData(cardUid);
   render();
 
-  // 2. Check if card is already claimed
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
   if (cardRecord.user_id) {
-    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session && session.user.id === cardRecord.user_id) {
       isOwner = true;
       document.getElementById('editFab').classList.remove('hidden');
     }
-    return;
-  }
-
-  // 3. Unclaimed card: Authenticate once to claim it
-  const { data: { session } } = await supabaseClient.auth.getSession();
-
-  if (!session) {
-    await supabaseClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href }
-    });
   } else {
-    await supabaseClient
-      .from('nfc_cards')
-      .update({ user_id: session.user.id })
-      .eq('nfc_uid', cardUid);
+    if (session) {
+      await supabaseClient
+        .from('nfc_cards')
+        .update({ user_id: session.user.id })
+        .eq('nfc_uid', cardUid);
 
-    isOwner = true;
-    editing = true;
-    document.getElementById('editFab').classList.remove('hidden');
-    render();
+      isOwner = true;
+      document.getElementById('editFab').classList.remove('hidden');
+    } else {
+      // Show sign in button since card is unclaimed and user is not logged in
+      const promptBtn = document.getElementById('authPromptBtn');
+      promptBtn.classList.remove('hidden');
+      promptBtn.onclick = async () => {
+        await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.href }
+        });
+      };
+    }
   }
 }
 
@@ -354,7 +351,6 @@ async function init(){
   });
   document.getElementById('doneBtn').addEventListener('click', ()=>{ editing=false; render(); });
   
-  // Save profile edits straight into Supabase database
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
     const statusEl = document.getElementById('statusEl');
     if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
