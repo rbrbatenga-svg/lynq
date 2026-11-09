@@ -152,7 +152,7 @@ const DEFAULT_STATE = {
 };
 
 let state = JSON.parse(document.getElementById('state-data')?.textContent || JSON.stringify(DEFAULT_STATE));
-let editing = false, isOwner = false, assetsAPI = null, artifactAPI = null;
+let editing = false, isOwner = false, currentCardUid = null;
 
 function linkHref(platform, url){
   if(platform==="email" && !url.startsWith("mailto:")) return "mailto:"+url;
@@ -220,47 +220,92 @@ function toDataUrl(file, cb){
   r.readAsDataURL(file);
 }
 
-async function buildHtmlWithState(){
-  const resp = await fetch(window.location.href).catch(()=>null);
-  let base = resp ? await resp.text() : document.documentElement.outerHTML;
-  const json = JSON.stringify(state).replace(/</g,'\\u003c');
-  if(base.includes('id="state-data"')){
-    base = base.replace(/<script id="state-data"[^>]*>[\s\S]*?<\/script>/, `<script id="state-data" type="application/json">${json}<\/script>`);
-  } else {
-    base = base.replace('</body>', `<script id="state-data" type="application/json">${json}<\/script></body>`);
+// Database Integration: Load and Save Profile State via Supabase
+async function loadCardData(cardUid) {
+  const { data: cardRecord, error } = await supabaseClient
+    .from('nfc_cards')
+    .select('*')
+    .eq('nfc_uid', cardUid)
+    .single();
+
+  if (cardRecord && cardRecord.bio) {
+    // If you store the JSON profile payload in bio or another column, parse it here
+    try {
+      const parsed = JSON.parse(cardRecord.bio);
+      if (parsed && typeof parsed === 'object') {
+        state = { ...DEFAULT_STATE, ...parsed };
+      }
+    } catch (_e) {
+      // Fallback if bio column holds raw string
+      state.bio = cardRecord.bio;
+      if (cardRecord.card_title) state.name = cardRecord.card_title;
+    }
   }
-  return base;
 }
 
-// Fixed NFC Card Authentication & Binding Flow
+async function saveCardData() {
+  if (!currentCardUid) return;
+  const profileJsonString = JSON.stringify(state);
+  
+  const { error } = await supabaseClient
+    .from('nfc_cards')
+    .update({ 
+      bio: profileJsonString,
+      card_title: state.name 
+    })
+    .eq('nfc_uid', currentCardUid);
+
+  if (error) throw error;
+}
+
+// Single-Login & Database-Backed Binding Flow
 async function handleNfcCardBinding() {
   const urlParams = new URLSearchParams(window.location.search);
   const cardUid = urlParams.get('card');
   if (!cardUid) return;
+  currentCardUid = cardUid;
 
+  // 1. Fetch card record from database
+  const { data: cardRecord, error } = await supabaseClient
+    .from('nfc_cards')
+    .select('*')
+    .eq('nfc_uid', cardUid)
+    .single();
+
+  if (!cardRecord) return;
+
+  // Load existing profile contents into state
+  await loadCardData(cardUid);
+  render();
+
+  // 2. Check if card is already claimed
+  if (cardRecord.user_id) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user.id === cardRecord.user_id) {
+      isOwner = true;
+      document.getElementById('editFab').classList.remove('hidden');
+    }
+    return;
+  }
+
+  // 3. Unclaimed card: Authenticate once to claim it
   const { data: { session } } = await supabaseClient.auth.getSession();
 
   if (!session) {
-    // Not logged in: Trigger Google OAuth Login redirect back with card query
     await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.href }
     });
   } else {
-    // Logged in: Verify card record exists in database
-    const { data: cardRecord, error } = await supabaseClient
+    await supabaseClient
       .from('nfc_cards')
-      .select('*')
-      .eq('nfc_uid', cardUid)
-      .single();
+      .update({ user_id: session.user.id })
+      .eq('nfc_uid', cardUid);
 
-    if (cardRecord) {
-      // Successfully authenticated & verified card owner: Unlock edit tools immediately
-      isOwner = true;
-      editing = true;
-      document.getElementById('editFab').classList.remove('hidden');
-      render();
-    }
+    isOwner = true;
+    editing = true;
+    document.getElementById('editFab').classList.remove('hidden');
+    render();
   }
 }
 
@@ -268,7 +313,6 @@ async function init(){
   populatePlatforms();
   render();
 
-  // Execute NFC Card Binding & Verification flow on load
   await handleNfcCardBinding().catch(console.error);
 
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
@@ -302,35 +346,26 @@ async function init(){
   });
   document.getElementById('avatarFile').addEventListener('change', async e=>{
     const file = e.target.files[0]; if(!file) return;
-    if(assetsAPI){ try{ const up = await assetsAPI.upload(file); state.avatar = up.url; render(); return; }catch(_e){} }
     toDataUrl(file, url=>{ state.avatar = url; render(); });
   });
   document.getElementById('coverFile').addEventListener('change', async e=>{
     const file = e.target.files[0]; if(!file) return;
-    if(assetsAPI){ try{ const up = await assetsAPI.upload(file); state.cover = up.url; render(); return; }catch(_e){} }
     toDataUrl(file, url=>{ state.cover = url; render(); });
   });
   document.getElementById('doneBtn').addEventListener('click', ()=>{ editing=false; render(); });
+  
+  // Save profile edits straight into Supabase database
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
     const statusEl = document.getElementById('statusEl');
-    if(!artifactAPI){ statusEl.textContent='Preview mode only (owner tools not connected here).'; return; }
-    statusEl.textContent='Publishing...';
+    if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
+    statusEl.textContent='Saving to database...';
     try{
-      const html = await buildHtmlWithState();
-      await artifactAPI.publish(html);
-      statusEl.textContent='Saved. This page is now live for anyone with the link.';
+      await saveCardData();
+      statusEl.textContent='Saved successfully! Changes are now live.';
     }catch(err){ statusEl.textContent='Could not save: '+(err?.message||'try again'); }
   });
-  document.getElementById('editFab').addEventListener('click', ()=>{ editing = !editing; render(); });
 
-  // Owner / platform tools light up asynchronously -- page already works without them
-  try{
-    const user = await claude.use("user");
-    isOwner = !!(user && user.isOwner && user.isOwner());
-    if(isOwner) document.getElementById('editFab').classList.remove('hidden');
-  }catch(_e){}
-  try{ artifactAPI = await claude.use("artifact"); }catch(_e){}
-  try{ assetsAPI = await claude.use("assets"); }catch(_e){}
+  document.getElementById('editFab').addEventListener('click', ()=>{ editing = !editing; render(); });
 }
 init();
 </script>
