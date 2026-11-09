@@ -31,25 +31,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .wrap{max-width:460px;margin:0 auto;padding:0 18px 60px;width:100%;}
 .card{background:var(--card);border-radius:18px;margin-top:-60px;padding:24px 20px 20px;position:relative;
   box-shadow:0 6px 24px rgba(0,0,0,.12);width:100%;}
+
+/* Header layout: Profile photo on left, Gallery button on opposite side */
+.avatar-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-70px;margin-bottom:12px;}
 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--card);
-  margin-top:-70px;display:block;background:var(--accent);}
-h1{font-size:22px;margin:12px 0 4px;color:var(--text);}
+  display:block;background:var(--accent);}
+.gallery-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid rgba(127,127,127,.25);background:var(--card);color:var(--text);cursor:pointer;margin-bottom:6px;}
+.gallery-btn svg{width:16px;height:16px;flex:none;stroke:var(--accent);}
+
+h1{font-size:22px;margin:8px 0 4px;color:var(--text);}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
 .edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 10px;}
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.2);background:var(--card);color:var(--text);}
 .contact-btn svg{width:14px;height:14px;flex:none;}
-.work{margin:2px 0 14px;}
+.work{margin:2px 0 2px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
 .workrow .dur{color:var(--sub);font-size:12px;}
-.worklocation{font-size:13px;color:var(--sub);margin-bottom:8px;}
+.worklocation{font-size:13px;color:var(--sub);margin-bottom:12px;}
 .worklistitem{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(127,127,127,.15);}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
-
-/* User Photo Gallery Grid */
-.gallery-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin:14px 0;}
-.gallery-img{width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;border:1px solid rgba(127,127,127,.2);}
 
 /* Links Layout Styles */
 .links.list-layout{display:flex;flex-direction:column;gap:10px;}
@@ -70,8 +72,12 @@ h1{font-size:22px;margin:12px 0 4px;color:var(--text);}
 .inbox-fab{position:fixed;right:84px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#333;
   color:#fff;border:none;border-radius:999px;padding:12px 14px;font-weight:700;font-size:14px;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;display:flex;align-items:center;gap:6px;}
+.inbox-fab svg{width:16px;height:16px;stroke:#ffffff;fill:none;}
+
 .panel{background:var(--card);border-radius:14px;padding:16px;margin-top:16px;border:1px solid rgba(127,127,127,.15);width:100%;}
-.panel h3{margin:0 0 10px;font-size:14px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;}
+.panel h3{margin:0 0 10px;font-size:14px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:6px;}
+.panel h3 svg{width:16px;height:16px;stroke:var(--sub);fill:none;}
+
 .row{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
 .row label{font-size:13px;color:var(--sub);min-width:80px;}
 input[type=text],input[type=url],textarea,select{flex:1;padding:9px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.3);
@@ -87,12 +93,18 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 
+/* Sign-in prompt & Bottom Switch Account Link */
 .auth-prompt{
   font-size:13px; color:var(--sub); text-align:center; margin-top:20px; display:block;
 }
 .auth-prompt a{
   color:var(--accent); text-decoration:underline; font-weight:600; cursor:pointer;
 }
+
+.switch-account-link{
+  display:block; text-align:center; margin:24px auto 0; font-size:11px; color:var(--sub); text-decoration:underline; cursor:pointer;
+}
+.switch-account-link:hover{ color:var(--accent); }
 
 .note-item {
   padding: 10px 0; border-bottom: 1px solid rgba(127,127,127,.15); position: relative;
@@ -121,6 +133,24 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .color-chip {
   width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(127,127,127,0.4); cursor: pointer;
 }
+
+/* Modal Popup for Photos Gallery */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s ease;
+}
+.modal-overlay.open { opacity:1; pointer-events:auto; }
+.modal-body {
+  background:var(--card); border-radius:16px; padding:20px; max-width:400px; width:100%; max-height:85vh; overflow-y:auto; position:relative; box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.modal-close {
+  position:absolute; top:12px; right:16px; font-size:22px; font-weight:700; color:var(--sub); cursor:pointer;
+}
+.modal-gallery-grid {
+  display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px;
+}
+.modal-gallery-img {
+  width:100%; border-radius:12px; object-fit:cover; border:1px solid rgba(127,127,127,0.2); max-height:260px;
+}
 </style>
 <script>
   (function() {
@@ -136,16 +166,21 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
   <div class="card" id="mainCardEl">
-    <img class="avatar" id="avatarImg" src="" alt="">
+    <!-- Avatar & Gallery Button Header Row -->
+    <div class="avatar-row">
+      <img class="avatar" id="avatarImg" src="" alt="">
+      <button class="gallery-btn hidden" id="openGalleryBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Gallery
+      </button>
+    </div>
+
     <h1 id="nameEl"></h1>
     <div class="work" id="workEl"></div>
     <div class="worklocation" id="workLocationEl"></div>
     <p class="bio" id="bioEl"></p>
     <div class="edutag hidden" id="eduTag"></div>
     <div class="contact-row" id="contactRow"></div>
-    
-    <!-- Gallery Grid for 3 Photos -->
-    <div class="gallery-grid hidden" id="galleryGrid"></div>
 
     <div class="links list-layout" id="linksEl"></div>
 
@@ -243,14 +278,32 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
   </div>
 
   <div class="panel hidden" id="inboxPanel">
-    <h3>📥 Visitor Notes Inbox</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Visitor Notes Inbox
+    </h3>
     <div id="notesListContainer" style="font-size:13px; color:var(--sub);">No notes yet.</div>
     <button class="btn secondary" id="closeInboxBtn" style="margin-top:12px;">Close Inbox</button>
+  </div>
+
+  <!-- Switch Account Hyperlink (Visible for Owners at bottom middle) -->
+  <a class="switch-account-link hidden" id="switchAccountBtn">Switch to different LYNQ account</a>
+</div>
+
+<!-- Modal Popup Container for Gallery -->
+<div class="modal-overlay" id="galleryModal">
+  <div class="modal-body">
+    <span class="modal-close" id="closeGalleryBtn">&times;</span>
+    <h3 style="margin:0 0 12px; font-size:16px; color:var(--text);">Photos</h3>
+    <div class="modal-gallery-grid" id="modalGalleryGrid"></div>
   </div>
 </div>
 
 <button class="fab hidden" id="editFab">Edit</button>
-<button class="inbox-fab hidden" id="inboxFab">📥 Inbox <span id="inboxCount">0</span></button>
+<button class="inbox-fab hidden" id="inboxFab">
+  <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+  Inbox <span id="inboxCount">0</span>
+</button>
 
 <script>
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
@@ -376,15 +429,14 @@ function render(){
     workLocationEl.textContent = '';
   }
 
-  // Render 3 Photo Gallery
-  const galleryGrid = document.getElementById('galleryGrid');
+  // Gallery Button & Modal rendering
+  const openGalleryBtn = document.getElementById('openGalleryBtn');
   const photos = state.photos || [];
   if (photos.length > 0) {
-    galleryGrid.classList.remove('hidden');
-    galleryGrid.innerHTML = photos.map(src => `<img class="gallery-img" src="${src}">`).join('');
+    openGalleryBtn.classList.remove('hidden');
+    document.getElementById('modalGalleryGrid').innerHTML = photos.map(src => `<img class="modal-gallery-img" src="${src}">`).join('');
   } else {
-    galleryGrid.classList.add('hidden');
-    galleryGrid.innerHTML = '';
+    openGalleryBtn.classList.add('hidden');
   }
 
   const workEl = document.getElementById('workEl');
@@ -529,6 +581,7 @@ async function handleNfcCardBinding() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   const promptBtn = document.getElementById('authPromptBtn');
   const signInLink = document.getElementById('signInLink');
+  const switchAccountBtn = document.getElementById('switchAccountBtn');
 
   if (session) {
     if (cardRecord.user_id === session.user.id) {
@@ -537,6 +590,7 @@ async function handleNfcCardBinding() {
       document.getElementById('inboxFab').classList.remove('hidden');
       document.getElementById('visitorNoteSection').classList.add('hidden');
       promptBtn.classList.add('hidden');
+      switchAccountBtn.classList.remove('hidden');
       fetchInboxNotes();
     } else if (!cardRecord.user_id) {
       const { error: updateErr } = await supabaseClient
@@ -550,6 +604,7 @@ async function handleNfcCardBinding() {
         document.getElementById('inboxFab').classList.remove('hidden');
         document.getElementById('visitorNoteSection').classList.add('hidden');
         promptBtn.classList.add('hidden');
+        switchAccountBtn.classList.remove('hidden');
         fetchInboxNotes();
       } else {
         showError("Failed to claim card: " + updateErr.message);
@@ -574,6 +629,27 @@ async function init(){
     showError("Init error: " + err.message);
     const loader = document.getElementById('loadingScreen');
     if(loader) loader.remove();
+  });
+
+  // Modal Open/Close handlers
+  document.getElementById('openGalleryBtn').addEventListener('click', () => {
+    document.getElementById('galleryModal').classList.add('open');
+  });
+  document.getElementById('closeGalleryBtn').addEventListener('click', () => {
+    document.getElementById('galleryModal').classList.remove('open');
+  });
+  document.getElementById('galleryModal').addEventListener('click', (e) => {
+    if(e.target.id === 'galleryModal') document.getElementById('galleryModal').classList.remove('open');
+  });
+
+  // Switch account functionality
+  document.getElementById('switchAccountBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await supabaseClient.auth.signOut();
+    await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.href }
+    });
   });
 
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
