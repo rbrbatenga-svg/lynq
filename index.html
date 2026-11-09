@@ -444,7 +444,6 @@ function render(){
   eduEl.style.setProperty('--tagcolor', t.accent);
   if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
   
-  // Render Languages & Hobbies extra tags
   const extraContainer = document.getElementById('extraTagsContainer');
   let extraHtml = '';
   if (state.languages) {
@@ -465,7 +464,6 @@ function render(){
   }
   contactRow.innerHTML = contactHtml;
 
-  // Render City and Country Location
   const workLocationEl = document.getElementById('workLocationEl');
   if (state.workCityCountry) {
     workLocationEl.textContent = state.workCityCountry;
@@ -475,7 +473,6 @@ function render(){
     workLocationEl.textContent = '';
   }
 
-  // Gallery Button & Modal rendering
   const openGalleryBtn = document.getElementById('openGalleryBtn');
   const photos = state.photos || [];
   if (photos.length > 0) {
@@ -583,8 +580,14 @@ async function fetchInboxNotes() {
 
 async function handleNfcCardBinding() {
   const urlParams = new URLSearchParams(window.location.search);
-  const cardUid = urlParams.get('card');
-  
+  let cardUid = urlParams.get('card');
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (!cardUid) {
+    cardUid = sessionStorage.getItem('pending_lynq_card');
+  }
+
   if (!cardUid) {
     document.getElementById('loaderTextEl').textContent = "Please tap the LYNQ Card";
     return;
@@ -597,14 +600,8 @@ async function handleNfcCardBinding() {
     .eq('nfc_uid', cardUid)
     .single();
 
-  if (error) {
-    showError("Database error: " + error.message);
-    render();
-    return;
-  }
-
-  if (!cardRecord) {
-    showError("Card ID '" + cardUid + "' not found in database.");
+  if (error || !cardRecord) {
+    showError("Card ID '" + cardUid + "' not found or database error.");
     render();
     return;
   }
@@ -622,7 +619,6 @@ async function handleNfcCardBinding() {
   }
   render();
 
-  const { data: { session } } = await supabaseClient.auth.getSession();
   const promptBtn = document.getElementById('authPromptBtn');
   const signInLink = document.getElementById('signInLink');
   const switchAccountBtn = document.getElementById('switchAccountBtn');
@@ -658,9 +654,12 @@ async function handleNfcCardBinding() {
     promptBtn.classList.remove('hidden');
     signInLink.onclick = (e) => {
       e.preventDefault();
+      if (currentCardUid) {
+        sessionStorage.setItem('pending_lynq_card', currentCardUid);
+      }
       supabaseClient.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href }
+        options: { redirectTo: window.location.origin + window.location.pathname + (currentCardUid ? '?card=' + currentCardUid : '') }
       });
     };
   }
@@ -675,7 +674,6 @@ async function init(){
     if(loader) loader.remove();
   });
 
-  // Modal Open/Close handlers
   document.getElementById('openGalleryBtn').addEventListener('click', () => {
     document.getElementById('galleryModal').classList.add('open');
   });
@@ -686,7 +684,6 @@ async function init(){
     if(e.target.id === 'galleryModal') document.getElementById('galleryModal').classList.remove('open');
   });
 
-  // Switch account functionality
   document.getElementById('switchAccountBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     await supabaseClient.auth.signOut();
