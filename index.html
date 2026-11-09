@@ -73,16 +73,43 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
 .hidden{display:none !important;}
 .status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 .auth-prompt{font-size:13px;color:var(--accent);text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;display:block;}
+
+/* Loading overlay */
+#loadingScreen {
+  position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 600; color: var(--sub);
+  transition: opacity 0.3s ease;
+}
+
+/* Smooth expandable note drawer */
+.note-drawer {
+  max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out, opacity 0.25s ease;
+  opacity: 0;
+}
+.note-drawer.open {
+  max-height: 250px; opacity: 1;
+}
+.color-chips {
+  display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;
+}
+.color-chip {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(127,127,127,0.3); cursor: pointer;
+}
 </style>
 <script>
-  // Instant theme apply to prevent dark flash on load
   (function() {
-    const savedTheme = localStorage.getItem('lynq_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    const savedThemeBg = localStorage.getItem('lynq_bg_theme') || '#f4f5f7';
+    document.documentElement.style.setProperty('--bg', savedThemeBg);
+    if(savedThemeBg === '#111214' || savedThemeBg === '#1a1a1a') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   })();
 </script>
 </head>
 <body>
+
+<div id="loadingScreen">Loading information, please wait</div>
 
 <div class="cover" id="coverEl"><div class="ov"></div></div>
 <div class="wrap">
@@ -96,10 +123,12 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="links" id="linksEl"></div>
 
     <div class="note-section" id="visitorNoteSection">
-      <h3>Leave a note for the owner</h3>
-      <textarea id="visitorNoteText" placeholder="Write a quick message or note..."></textarea>
-      <button class="btn" id="sendNoteBtn" style="margin-top:8px;">Send Note</button>
-      <div class="status" id="noteStatusEl" style="color:var(--sub)"></div>
+      <button class="btn secondary" id="toggleNoteBtn" style="width:100%;">Leave a note</button>
+      <div class="note-drawer" id="noteDrawer">
+        <textarea id="visitorNoteText" placeholder="Write a quick message or note..." style="margin-top:12px;"></textarea>
+        <button class="btn" id="sendNoteBtn" style="margin-top:8px; width:100%;">Send Note</button>
+        <div class="status" id="noteStatusEl" style="color:var(--sub)"></div>
+      </div>
     </div>
 
     <div class="status" id="globalErrorEl"></div>
@@ -112,7 +141,24 @@ input[type=color]{width:44px;height:34px;border:none;background:none;}
     <div class="row"><label>Cover photo</label><input type="file" id="coverFile" accept="image/*"></div>
     <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
     <div class="row"><label>Accent color</label><input type="color" id="accentPick" value="#4472C4"></div>
-    <div class="note">Click your name or bio above to edit them directly.</div>
+    
+    <h3 style="margin-top:18px;">Page Background Theme</h3>
+    <div class="row">
+      <label>Custom BG</label>
+      <input type="color" id="bgCustomPick" value="#f4f5f7">
+    </div>
+    <div class="row">
+      <label>Presets</label>
+      <div class="color-chips">
+        <div class="color-chip" style="background:#f4f5f7;" onclick="setBgTheme('#f4f5f7')"></div>
+        <div class="color-chip" style="background:#ffffff;" onclick="setBgTheme('#ffffff')"></div>
+        <div class="color-chip" style="background:#111214;" onclick="setBgTheme('#111214')"></div>
+        <div class="color-chip" style="background:#1a2e40;" onclick="setBgTheme('#1a2e40')"></div>
+        <div class="color-chip" style="background:#2d1b36;" onclick="setBgTheme('#2d1b36')"></div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:10px;">Click your name or bio above to edit them directly.</div>
 
     <h3 style="margin-top:18px;">Education (optional)</h3>
     <div class="row"><label>Level</label><select id="eduLevel"><option value="">— Select —</option><option value="High School">High School</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option><option value="Med School">Med School</option><option value="Law School">Law School</option></select></div>
@@ -180,7 +226,7 @@ const ICONS = {
 
 const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
-  avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", theme:"light",
+  avatar:"", cover:"", coverOpacity:0.55, accent:"#4472C4", bgTheme:"#f4f5f7",
   education:"", eduYear:"", eduSection:"", eduLevel:"", phone:"", email:"", work:[],
   links:[]
 };
@@ -192,9 +238,24 @@ function showError(msg) {
   document.getElementById('globalErrorEl').textContent = msg;
 }
 
+function setBgTheme(color) {
+  state.bgTheme = color;
+  document.documentElement.style.setProperty('--bg', color);
+  localStorage.setItem('lynq_bg_theme', color);
+  document.getElementById('bgCustomPick').value = color;
+  if(color === '#111214' || color === '#1a2e40' || color === '#2d1b36' || color === '#1a1a1a') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+}
+
 function render(){
   document.documentElement.style.setProperty('--accent', state.accent||'#4472C4');
   document.documentElement.style.setProperty('--ovop', state.coverOpacity ?? 0.55);
+  if(state.bgTheme) {
+    document.documentElement.style.setProperty('--bg', state.bgTheme);
+  }
   document.getElementById('coverEl').style.backgroundImage = state.cover ? `url(${state.cover})` : 'linear-gradient(135deg,#4472C4,#2E5395)';
   document.getElementById('avatarImg').src = state.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%234472C4"/></svg>';
   document.getElementById('nameEl').textContent = state.name;
@@ -247,6 +308,7 @@ function render(){
   document.getElementById('editPanel').classList.toggle('hidden', !editing);
   document.getElementById('opRange').value = Math.round((state.coverOpacity ?? 0.55)*100);
   document.getElementById('accentPick').value = state.accent || '#4472C4';
+  if(state.bgTheme) document.getElementById('bgCustomPick').value = state.bgTheme;
   document.getElementById('eduSchool').value = state.education || '';
   document.getElementById('eduYear').value = state.eduYear || '';
   document.getElementById('eduSection').value = state.eduSection || '';
@@ -254,6 +316,13 @@ function render(){
   document.getElementById('eduColorPick').value = state.eduColor || state.accent || '#4472C4';
   document.getElementById('phoneInput').value = state.phone || '';
   document.getElementById('emailInput').value = state.email || '';
+
+  // Hide loading screen smoothly
+  const loader = document.getElementById('loadingScreen');
+  if(loader) {
+    loader.style.opacity = '0';
+    setTimeout(() => loader.remove(), 300);
+  }
 }
 
 function populatePlatforms(){
@@ -369,12 +438,17 @@ async function handleNfcCardBinding() {
 
 async function init(){
   populatePlatforms();
-  await handleNfcCardBinding().catch(err => showError("Init error: " + err.message));
+  await handleNfcCardBinding().catch(err => {
+    showError("Init error: " + err.message);
+    const loader = document.getElementById('loadingScreen');
+    if(loader) loader.remove();
+  });
 
   document.getElementById('nameEl').addEventListener('input', e=> state.name = e.target.textContent);
   document.getElementById('bioEl').addEventListener('input', e=> state.bio = e.target.textContent);
   document.getElementById('opRange').addEventListener('input', e=>{ state.coverOpacity = e.target.value/100; render(); });
   document.getElementById('accentPick').addEventListener('input', e=>{ state.accent = e.target.value; render(); });
+  document.getElementById('bgCustomPick').addEventListener('input', e=>{ setBgTheme(e.target.value); });
   document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
   document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
   document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
@@ -383,6 +457,14 @@ async function init(){
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
   document.getElementById('emailInput').addEventListener('input', e=>{ state.email = e.target.value; render(); });
   
+  // Smooth toggle note drawer
+  document.getElementById('toggleNoteBtn').addEventListener('click', ()=>{
+    const drawer = document.getElementById('noteDrawer');
+    drawer.classList.toggle('open');
+    const btn = document.getElementById('toggleNoteBtn');
+    btn.textContent = drawer.classList.contains('open') ? 'Cancel' : 'Leave a note';
+  });
+
   document.getElementById('addWorkBtn').addEventListener('click', ()=>{
     const role = document.getElementById('workRole').value.trim();
     const company = document.getElementById('workCompany').value.trim();
