@@ -90,7 +90,7 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .extra-section-container{margin: 14px 0; text-align: left; display: flex; flex-direction: column; gap: 10px;}
 .extra-group{display: flex; flex-direction: column; gap: 6px;}
 .extra-label{font-weight: 700; font-size: 13px; color: var(--sub);}
-.chips-flex{display: flex; flex-wrap: wrap; gap: 6px;}
+.chips-flex{display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px;}
 .chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
 
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
@@ -179,6 +179,119 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   40% { transform: translateY(-4px); opacity: 1; }
 }
 
+/* Claim screen styling matching user requirement */
+.claim-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 340px;
+  gap: 16px;
+  text-align: center;
+}
+.claim-card-badge {
+  width: 48px;
+  height: 34px;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(68, 114, 196, 0.08);
+}
+.claim-card-badge svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent);
+  fill: none;
+}
+.claim-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+.claim-subtitle {
+  font-size: 13px;
+  color: var(--sub);
+  margin: -8px 0 4px;
+}
+.claim-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  margin: 4px 0;
+}
+.claim-step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.claim-step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(127,127,127,0.15);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin-top: 2px;
+}
+.claim-step-text strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+}
+.claim-step-text span {
+  font-size: 11.5px;
+  color: var(--sub);
+  line-height: 1.3;
+}
+.claim-footer-note {
+  font-size: 10px;
+  color: var(--sub);
+  line-height: 1.3;
+  opacity: 0.8;
+}
+.claim-footer-note a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.claim-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid rgba(0,0,0,0.15);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+  text-decoration: none;
+}
+.claim-google-btn:active { transform: scale(0.97); }
+.claim-google-btn svg { width: 18px; height: 18px; flex: none; }
+.claim-email-link {
+  font-size: 12px;
+  color: var(--sub);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .note-drawer {max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; opacity: 0;}
 .note-drawer.open {max-height: 250px; opacity: 1; margin-top: 10px;}
 
@@ -219,7 +332,7 @@ input[type=range]{flex:1;accent-color:var(--accent);}
 <body>
 
 <div id="loadingScreen">
-  <div class="loader-content">
+  <div class="loader-content" id="loaderContentEl">
     <div class="loader-logo">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       LYNQ
@@ -479,7 +592,6 @@ function downloadVCard() {
   const lastName = nameParts.length > 1 ? nameParts.pop() : '';
   const firstName = nameParts.join(' ');
 
-  // Check if owner added a WhatsApp link
   let whatsappUrl = '';
   if (state.links && state.links.length > 0) {
     const waLink = state.links.find(l => l.platform === 'whatsapp');
@@ -824,6 +936,68 @@ async function handleNfcCardBinding() {
     return;
   }
 
+  // If card has no user_id (unclaimed/new buyer), render the Claim your LYNQ Card screen matching the reference image
+  if (!cardRecord.user_id && !session) {
+    const loaderContent = document.getElementById('loaderContentEl');
+    if (loaderContent) {
+      loaderContent.innerHTML = `
+        <div class="claim-container">
+          <div class="claim-card-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div class="claim-title">Claim your LYNQ card</div>
+          <div class="claim-subtitle">Sign in once and your card is live.</div>
+          
+          <div class="claim-steps">
+            <div class="claim-step-row">
+              <div class="claim-step-num">1</div>
+              <div class="claim-step-text">
+                <strong>Sign in</strong>
+                <span>Tap Continue with Google. It takes a few seconds.</span>
+              </div>
+            </div>
+            <div class="claim-step-row">
+              <div class="claim-step-num">2</div>
+              <div class="claim-step-text">
+                <strong>No Google account? Use email</strong>
+                <span>We send you a one-time sign-in link.</span>
+              </div>
+            </div>
+            <div class="claim-step-row">
+              <div class="claim-step-num">3</div>
+              <div class="claim-step-text">
+                <strong>Build your profile</strong>
+                <span>Add your links, photo and contact details.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="claim-footer-note">
+            By signing in, you agree to our <a href="#" target="_blank">Terms</a> and <a href="#" target="_blank">Privacy Policy</a>. Tap to read them first.
+          </div>
+
+          <button class="claim-google-btn" id="claimGoogleBtn">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.17 21.32 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.44 8.12 0 9.87 0 11.7s.44 3.58 1.2 5.12l4.08-2.55z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.28 0 3.17 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+            Continue with Google
+          </button>
+          
+          <button class="claim-email-link" id="claimEmailBtn">Use email instead</button>
+          
+          <div style="font-size:10px; color:var(--sub); margin-top:-4px;">We only use your Google or email account to sign you in.</div>
+        </div>
+      `;
+
+      document.getElementById('claimGoogleBtn').onclick = () => {
+        sessionStorage.setItem('pending_lynq_card', cardUid);
+        supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + window.location.pathname + '?card=' + cardUid }
+        });
+      };
+    }
+    return;
+  }
+
   if (cardRecord.bio) {
     try {
       const parsed = JSON.parse(cardRecord.bio);
@@ -1002,7 +1176,7 @@ async function init(){
 
   document.getElementById('addLinkBtn').addEventListener('click', ()=>{
     const platform = document.getElementById('platformSel').value;
-    const url = document.getElementById('linkUrl').value.trim();
+    const url = document.getElementById('linkUrl']?.value.trim() || document.getElementById('linkUrl').value.trim();
     const customName = document.getElementById('customNameInput').value.trim();
     if(!url) return;
     state.links.push({platform, url, customName: platform === 'website' ? customName : ''});
