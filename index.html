@@ -93,11 +93,11 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .chips-flex{display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px;}
 .chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
 
-/* Justified contact row with slightly smaller compact buttons */
-.contact-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;}
-.contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;padding:7px 10px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease; cursor:pointer;flex:1;min-width:70px;text-align:center;white-space:nowrap;}
+/* Balanced justified contact row with compact buttons and proper spacing so text never clips or overflows */
+.contact-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;}
+.contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;padding:7px 8px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease; cursor:pointer;flex:1;min-width:64px;text-align:center;white-space:nowrap;overflow:hidden;}
 .contact-btn:active{transform: scale(0.95);}
-.contact-btn svg{width:13px;height:13px;flex:none;}
+.contact-btn svg{width:12px;height:12px;flex:none;}
 
 .work{margin:2px 0 2px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
@@ -120,7 +120,7 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .links.grid-layout .linkbtn svg{width:36px;height:36px;flex:none;}
 .links.grid-layout .linkbtn .rm{position:absolute;top:4px;right:8px;color:#d33;font-weight:700;cursor:pointer;font-size:16px;}
 
-/* Floating buttons container fixed to prevent overlap / collision */
+/* Floating actions container grouped neatly to prevent overlap with clean spacing */
 .floating-actions{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;z-index:20;}
 
 .fab{background:var(--accent);
@@ -431,7 +431,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   </div>
 </div>
 
-<!-- Floating actions container grouping Inbox & Edit buttons nicely side by side without overlapping -->
 <div class="floating-actions">
   <button class="inbox-fab hidden" id="inboxFab">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -665,7 +664,7 @@ function render(){
   let contactHtml = '';
   
   if (state.phone || state.email) {
-    contactHtml += `<button class="contact-btn" id="saveContactBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg> Save Contact</button>`;
+    contactHtml += `<button class="contact-btn" id="saveContactBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg> Save</button>`;
   }
 
   if(state.phone) {
@@ -675,7 +674,7 @@ function render(){
     contactHtml += `<a class="contact-btn" href="mailto:${state.email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg> Email</a>`;
   }
   if(state.qrImage) {
-    contactHtml += `<a class="contact-btn" id="openQrModalBtn" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/></svg> ${state.qrName || 'Payment QR'}</a>`;
+    contactHtml += `<a class="contact-btn" id="openQrModalBtn" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/></svg> ${state.qrName || 'QR'}</a>`;
   }
   contactRow.innerHTML = contactHtml;
 
@@ -1050,7 +1049,7 @@ async function init(){
     const school = document.getElementById('eduSchoolInput').value.trim();
     const year = document.getElementById('eduYearInput').value.trim();
     const program = document.getElementById('eduProgramInput').value.trim();
-    const achievements = document.getElementById('eduAuthInput')?.value.trim() || document.getElementById('eduAchieveInput').value.trim();
+    const achievements = document.getElementById('eduAchieveInput').value.trim();
     if (!school) return;
     state.educationMilestones = state.educationMilestones || [];
     state.educationMilestones.push({ level, school, year, program, achievements });
@@ -1090,7 +1089,7 @@ async function init(){
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
     const statusEl = document.getElementById('statusEl');
     if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
-    statusEl.status='Saving to database...';
+    statusEl.textContent='Saving to database...';
     try{
       const payload = JSON.stringify(state);
       const { error } = await supabaseClient.from('nfc_cards').update({ bio: payload, card_title: state.name }).eq('nfc_uid', currentCardUid);
