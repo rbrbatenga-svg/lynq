@@ -93,10 +93,11 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .chips-flex{display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px;}
 .chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
 
-.contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
-.contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease; cursor:pointer;}
+/* Justified contact row with slightly smaller compact buttons */
+.contact-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;}
+.contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;padding:7px 10px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease; cursor:pointer;flex:1;min-width:70px;text-align:center;white-space:nowrap;}
 .contact-btn:active{transform: scale(0.95);}
-.contact-btn svg{width:14px;height:14px;flex:none;}
+.contact-btn svg{width:13px;height:13px;flex:none;}
 
 .work{margin:2px 0 2px;}
 .workrow{font-size:14px;color:var(--sub);margin-bottom:2px;}
@@ -119,14 +120,17 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .links.grid-layout .linkbtn svg{width:36px;height:36px;flex:none;}
 .links.grid-layout .linkbtn .rm{position:absolute;top:4px;right:8px;color:#d33;font-weight:700;cursor:pointer;font-size:16px;}
 
-.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);
+/* Floating buttons container fixed to prevent overlap / collision */
+.floating-actions{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;z-index:20;}
+
+.fab{background:var(--accent);
   color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14px;cursor:pointer;
-  box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:20;transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);}
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);}
 .fab:active{transform: scale(0.95);}
 
-.inbox-fab{position:fixed;right:92px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:rgba(30,30,30,0.85);backdrop-filter:blur(10px);
+.inbox-fab{background:rgba(30,30,30,0.85);backdrop-filter:blur(10px);
   color:#fff;border:none;border-radius:999px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;
-  box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:20;display:flex;align-items:center;gap:6px;}
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);display:flex;align-items:center;gap:6px;}
 .inbox-fab svg{width:16px;height:16px;stroke:#ffffff;fill:none;}
 
 .panel{background:var(--card-bg);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:20px;padding:20px;margin-top:16px;border:1px solid var(--border);width:100%;box-shadow:0 15px 35px rgba(0,0,0,0.1);}
@@ -427,11 +431,14 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   </div>
 </div>
 
-<button class="fab hidden" id="editFab">Edit Profile</button>
-<button class="inbox-fab hidden" id="inboxFab">
-  <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-  Inbox <span id="inboxCount">0</span>
-</button>
+<!-- Floating actions container grouping Inbox & Edit buttons nicely side by side without overlapping -->
+<div class="floating-actions">
+  <button class="inbox-fab hidden" id="inboxFab">
+    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    Inbox <span id="inboxCount">0</span>
+  </button>
+  <button class="fab hidden" id="editFab">Edit Profile</button>
+</div>
 
 <script>
 const SUPABASE_URL = 'https://wvsisplpyjcqeilykswx.supabase.co';
@@ -804,7 +811,6 @@ async function handleNfcCardBinding() {
 
   if (!cardUid) cardUid = sessionStorage.getItem('pending_lynq_card');
 
-  // If someone lands directly on the base domain or without a card ID, show the card missing / inactivity message with SVG & brand name
   if (!cardUid) {
     const loaderContent = document.getElementById('loaderContentEl');
     if (loaderContent) {
@@ -835,47 +841,47 @@ async function handleNfcCardBinding() {
     const loaderContent = document.getElementById('loaderContentEl');
     if (loaderContent) {
       loaderContent.innerHTML = `
-        <div class="claim-container">
-          <div class="claim-card-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <div class="claim-container" style="display:flex; flex-direction:column; align-items:center; width:100%; max-width:340px; gap:16px; text-align:center;">
+          <div style="width:48px; height:34px; border:1.5px solid var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; background:rgba(68, 114, 196, 0.08);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;stroke:var(--accent);"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           </div>
-          <div class="claim-title">Claim your LYNQ card</div>
-          <div class="claim-subtitle">Sign in once and your card is live.</div>
+          <div style="font-size:20px; font-weight:700; color:var(--text); margin:0;">Claim your LYNQ card</div>
+          <div style="font-size:13px; color:var(--sub); margin:-8px 0 4px;">Sign in once and your card is live.</div>
           
-          <div class="claim-steps">
-            <div class="claim-step-row">
-              <div class="claim-step-num">1</div>
-              <div class="claim-step-text">
-                <strong>Sign in</strong>
-                <span>Tap Continue with Google. It takes a few seconds.</span>
+          <div style="display:flex; flex-direction:column; gap:12px; width:100%; text-align:left; margin:4px 0;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:rgba(127,127,127,0.15); color:var(--text); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; margin-top:2px;">1</div>
+              <div>
+                <strong style="display:block; font-size:13px; color:var(--text);">Sign in</strong>
+                <span style="font-size:11.5px; color:var(--sub); line-height:1.3;">Tap Continue with Google. It takes a few seconds.</span>
               </div>
             </div>
-            <div class="claim-step-row">
-              <div class="claim-step-num">2</div>
-              <div class="claim-step-text">
-                <strong>No Google account? Use email</strong>
-                <span>We send you a one-time sign-in link.</span>
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:rgba(127,127,127,0.15); color:var(--text); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; margin-top:2px;">2</div>
+              <div>
+                <strong style="display:block; font-size:13px; color:var(--text);">No Google account? Use email</strong>
+                <span style="font-size:11.5px; color:var(--sub); line-height:1.3;">We send you a one-time sign-in link.</span>
               </div>
             </div>
-            <div class="claim-step-row">
-              <div class="claim-step-num">3</div>
-              <div class="claim-step-text">
-                <strong>Build your profile</strong>
-                <span>Add your links, photo and contact details.</span>
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:rgba(127,127,127,0.15); color:var(--text); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; margin-top:2px;">3</div>
+              <div>
+                <strong style="display:block; font-size:13px; color:var(--text);">Build your profile</strong>
+                <span style="font-size:11.5px; color:var(--sub); line-height:1.3;">Add your links, photo and contact details.</span>
               </div>
             </div>
           </div>
 
-          <div class="claim-footer-note">
-            By signing in, you agree to our <a href="#" target="_blank">Terms</a> and <a href="#" target="_blank">Privacy Policy</a>. Tap to read them first.
+          <div style="font-size:10px; color:var(--sub); line-height:1.3; opacity:0.8;">
+            By signing in, you agree to our <a href="#" target="_blank" style="color:var(--accent);">Terms</a> and <a href="#" target="_blank" style="color:var(--accent);">Privacy Policy</a>. Tap to read them first.
           </div>
 
-          <button class="claim-google-btn" id="claimGoogleBtn">
-            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.17 21.32 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.44 8.12 0 9.87 0 11.7s.44 3.58 1.2 5.12l4.08-2.55z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.28 0 3.17 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+          <button id="claimGoogleBtn" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 16px; border-radius:12px; background:#ffffff; color:#1a1a1a; border:1px solid rgba(0,0,0,0.15); font-weight:600; font-size:14px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex:none;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.17 21.32 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.44 8.12 0 9.87 0 11.7s.44 3.58 1.2 5.12l4.08-2.55z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.28 0 3.17 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
             Continue with Google
           </button>
           
-          <button class="claim-email-link" id="claimEmailBtn">Use email instead</button>
+          <button id="claimEmailBtn" style="font-size:12px; color:var(--sub); text-decoration:underline; background:none; border:none; cursor:pointer;">Use email instead</button>
           
           <div style="font-size:10px; color:var(--sub); margin-top:-4px;">We only use your Google or email account to sign you in.</div>
         </div>
@@ -1044,7 +1050,7 @@ async function init(){
     const school = document.getElementById('eduSchoolInput').value.trim();
     const year = document.getElementById('eduYearInput').value.trim();
     const program = document.getElementById('eduProgramInput').value.trim();
-    const achievements = document.getElementById('eduAchieveInput').value.trim();
+    const achievements = document.getElementById('eduAuthInput')?.value.trim() || document.getElementById('eduAchieveInput').value.trim();
     if (!school) return;
     state.educationMilestones = state.educationMilestones || [];
     state.educationMilestones.push({ level, school, year, program, achievements });
@@ -1084,7 +1090,7 @@ async function init(){
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
     const statusEl = document.getElementById('statusEl');
     if(!isOwner){ statusEl.textContent='Only the verified owner can save changes.'; return; }
-    statusEl.textContent='Saving to database...';
+    statusEl.status='Saving to database...';
     try{
       const payload = JSON.stringify(state);
       const { error } = await supabaseClient.from('nfc_cards').update({ bio: payload, card_title: state.name }).eq('nfc_uid', currentCardUid);
