@@ -93,7 +93,7 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .chips-flex{display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px;}
 .chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
 
-/* Balanced justified contact row with compact buttons and proper spacing so text never clips or overflows */
+/* Balanced justified contact row with compact buttons and proper spacing */
 .contact-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;}
 .contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;padding:7px 8px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease; cursor:pointer;flex:1;min-width:64px;text-align:center;white-space:nowrap;overflow:hidden;}
 .contact-btn:active{transform: scale(0.95);}
@@ -120,7 +120,6 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .links.grid-layout .linkbtn svg{width:36px;height:36px;flex:none;}
 .links.grid-layout .linkbtn .rm{position:absolute;top:4px;right:8px;color:#d33;font-weight:700;cursor:pointer;font-size:16px;}
 
-/* Floating actions container grouped neatly to prevent overlap with clean spacing */
 .floating-actions{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;z-index:20;}
 
 .fab{background:var(--accent);
@@ -373,7 +372,7 @@ input[type=range]{flex:1;accent-color:var(--accent);}
     <h3 style="margin-top:18px;">Add a link</h3>
     <div class="row">
       <select id="platformSel" onchange="toggleCustomLabel()"></select>
-      <input type="url" id="linkUrl" placeholder="https:// or phone / email">
+      <input type="url" id="linkUrl" placeholder="https://wa.me/639123456789 (Use international format)">
       <input type="text" id="customNameInput" class="hidden" placeholder="Custom label (e.g. My Portfolio)">
       <button class="btn" id="addLinkBtn">Add</button>
     </div>
@@ -532,11 +531,23 @@ function applyThemePreset(key) {
 function toggleCustomLabel() {
   const sel = document.getElementById('platformSel').value;
   const customInput = document.getElementById('customNameInput');
+  const linkUrlInput = document.getElementById('linkUrl');
+  
   if (sel === 'website') {
     customInput.classList.remove('hidden');
   } else {
     customInput.classList.add('hidden');
     customInput.value = '';
+  }
+
+  if (sel === 'whatsapp') {
+    linkUrlInput.value = 'https://wa.me/';
+    linkUrlInput.placeholder = 'https://wa.me/639123456789 (Use international format)';
+  } else {
+    if (linkUrlInput.value === 'https://wa.me/') {
+      linkUrlInput.value = '';
+    }
+    linkUrlInput.placeholder = 'https:// or phone / email';
   }
 }
 
@@ -774,6 +785,7 @@ function render(){
 function populatePlatforms(){
   const sel = document.getElementById('platformSel');
   sel.innerHTML = Object.entries(ICONS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
+  toggleCustomLabel();
 }
 
 async function deleteNote(noteId) {
@@ -950,7 +962,6 @@ async function handleNfcCardBinding() {
 
 async function init(){
   populatePlatforms();
-  toggleCustomLabel();
   await handleNfcCardBinding().catch(err => {
     const loaderText = document.getElementById('loaderTextEl');
     if(loaderText) loaderText.innerHTML = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
@@ -1079,7 +1090,7 @@ async function init(){
     const customName = document.getElementById('customNameInput').value.trim();
     if(!url) return;
     state.links.push({platform, url, customName: platform === 'website' ? customName : ''});
-    document.getElementById('linkUrl').value='';
+    document.getElementById('linkUrl').value = (platform === 'whatsapp') ? 'https://wa.me/' : '';
     document.getElementById('customNameInput').value='';
     render();
   });
