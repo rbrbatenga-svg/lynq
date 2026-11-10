@@ -85,9 +85,12 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .timeline-item::before{content: ''; position: absolute; left: -16px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--card-bg);}
 .timeline-level{font-weight: 700; color: var(--text); font-size: 12px;}
 .timeline-school{color: var(--text); font-weight: 500;}
+.timeline-subinfo{color: var(--sub); font-size: 11px; margin-top: 1px;}
 .timeline-achievements{margin: 2px 0 0; padding-left: 12px; font-size: 10.5px; color: var(--sub); list-style-type: disc;}
 
-.infotag{display:inline-block;font-size:12px;font-weight:500;color:var(--text);background:rgba(127,127,127,0.1);border-radius:999px;padding:5px 12px;margin:0 4px 6px 0;}
+/* Individual Centralized Floating Bubbles for Languages & Hobbies */
+.chips-container{display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0;}
+.chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
 
 /* Centralized Contact Row */
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
@@ -323,7 +326,9 @@ input[type=range]{flex:1;accent-color:var(--accent);}
     <h3 style="margin-top:18px;">Education Roadmap</h3>
     <div id="educationList"></div>
     <div class="row"><label>Level</label><select id="eduLevelInput"><option value="Elementary">Elementary</option><option value="Junior High">Junior High</option><option value="Senior High">Senior High</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option></select></div>
-    <div class="row"><label>School</label><input type="text" id="eduSchoolInput" placeholder="School name & degree"></div>
+    <div class="row"><label>School/Uni</label><input type="text" id="eduSchoolInput" placeholder="School or University Name"></div>
+    <div class="row"><label>Year</label><input type="text" id="eduYearInput" placeholder="e.g. 2022 - 2026 / 3rd Year"></div>
+    <div class="row"><label>Program</label><input type="text" id="eduProgramInput" placeholder="e.g. BS Criminology / STEM"></div>
     <div class="row"><label>Achievements</label><input type="text" id="eduAchieveInput" placeholder="Comma separated achievements"></div>
     <button class="btn" id="addEduBtn" style="width:100%; margin-bottom:12px;">Add Education Milestone</button>
 
@@ -446,6 +451,15 @@ const DEFAULT_STATE = {
 let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let editing = false, isOwner = false, currentCardUid = null;
 
+const EDU_RANKS = {
+  'Elementary': 1,
+  'Junior High': 2,
+  'Senior High': 3,
+  'College': 4,
+  'Masteral': 5,
+  'Doctoral': 6
+};
+
 function applyThemePreset(key) {
   const t = THEMES[key] || THEMES['clean-light'];
   state.themeKey = key;
@@ -528,6 +542,11 @@ function render(){
   document.getElementById('nameEl').textContent = state.name;
   document.getElementById('bioEl').textContent = state.bio;
   
+  // Sort education milestones by rank highest first (Doctoral -> Masteral -> College -> ...)
+  if (state.educationMilestones && state.educationMilestones.length > 0) {
+    state.educationMilestones.sort((a, b) => (EDU_RANKS[b.level] || 0) - (EDU_RANKS[a.level] || 0));
+  }
+
   // Education Roadmap
   const eduBox = document.getElementById('eduRoadmapBox');
   const eduSummary = document.getElementById('eduRoadmapSummary');
@@ -536,8 +555,8 @@ function render(){
 
   if (milestones.length > 0) {
     eduBox.classList.remove('hidden');
-    const latest = milestones[milestones.length - 1];
-    eduSummary.textContent = `${latest.level}: ${latest.school}`;
+    const highest = milestones[0]; // Highest is on top
+    eduSummary.textContent = `${highest.level}: ${highest.school} (${highest.program || highest.year || ''})`;
 
     timelineList.innerHTML = milestones.map(m => {
       const achieveList = m.achievements ? m.achievements.split(',').map(a => `<li>${a.trim()}</li>`).join('') : '';
@@ -545,6 +564,7 @@ function render(){
         <div class="timeline-item">
           <div class="timeline-level">${m.level}</div>
           <div class="timeline-school">${m.school}</div>
+          <div class="timeline-subinfo">${[m.program, m.year].filter(Boolean).join(' • ')}</div>
           ${achieveList ? `<ul class="timeline-achievements">${achieveList}</ul>` : ''}
         </div>
       `;
@@ -557,7 +577,7 @@ function render(){
   const educationListDiv = document.getElementById('educationList');
   educationListDiv.innerHTML = milestones.map((m, idx) => `
     <div class="worklistitem">
-      <span><b>${m.level}</b>: ${m.school}</span>
+      <span><b>${m.level}</b>: ${m.school} — ${m.program || ''} (${m.year || ''})</span>
       <span class="rm" data-i="${idx}">×</span>
     </div>
   `).join('');
@@ -566,10 +586,18 @@ function render(){
     render();
   });
 
+  // Languages & Hobbies individual centralized bubbles
   const extraContainer = document.getElementById('extraTagsContainer');
   let extraHtml = '';
-  if (state.languages) extraHtml += `<div class="infotag">Languages: ${state.languages}</div>`;
-  if (state.hobbies) extraHtml += `<div class="infotag">Hobbies: ${state.hobbies}</div>`;
+  const langs = (state.languages || '').split(',').map(s => s.trim()).filter(Boolean);
+  const hobs = (state.hobbies || '').split(',').map(s => s.trim()).filter(Boolean);
+  
+  if (langs.length > 0 || hobs.length > 0) {
+    extraHtml += `<div class="chips-container">`;
+    langs.forEach(l => { extraHtml += `<div class="chip-bubble">${l}</div>`; });
+    hobs.forEach(h => { extraHtml += `<div class="chip-bubble">${h}</div>`; });
+    extraHtml += `</div>`;
+  }
   extraContainer.innerHTML = extraHtml;
 
   const contactRow = document.getElementById('contactRow');
@@ -883,11 +911,15 @@ async function init(){
   document.getElementById('addEduBtn').addEventListener('click', () => {
     const level = document.getElementById('eduLevelInput').value;
     const school = document.getElementById('eduSchoolInput').value.trim();
+    const year = document.getElementById('eduYearInput').value.trim();
+    const program = document.getElementById('eduProgramInput').value.trim();
     const achievements = document.getElementById('eduAchieveInput').value.trim();
     if (!school) return;
     state.educationMilestones = state.educationMilestones || [];
-    state.educationMilestones.push({ level, school, achievements });
+    state.educationMilestones.push({ level, school, year, program, achievements });
     document.getElementById('eduSchoolInput').value = '';
+    document.getElementById('eduYearInput').value = '';
+    document.getElementById('eduProgramInput').value = '';
     document.getElementById('eduAchieveInput').value = '';
     render();
   });
