@@ -70,10 +70,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
-.edutag{display:inline-block;font-size:12px;font-weight:600;color:var(--tagcolor, var(--accent));background:color-mix(in srgb, var(--tagcolor, var(--accent)) 12%, transparent);border:1px solid var(--tagcolor, var(--accent));border-radius:999px;padding:5px 12px;margin:0 0 6px;}
+
+/* Education Roadmap Dropdown styles */
+.eduroadmap-box{margin: 10px 0 14px; background: rgba(127,127,127,0.06); border: 1px solid rgba(127,127,127,0.15); border-radius: 14px; overflow: hidden;}
+.eduroadmap-header{display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);}
+.eduroadmap-header svg{width: 14px; height: 14px; stroke: var(--accent); transition: transform 0.3s ease;}
+.eduroadmap-box.open .eduroadmap-header svg{transform: rotate(180deg);}
+.eduroadmap-content{max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s ease; padding: 0 14px;}
+.eduroadmap-box.open .eduroadmap-content{max-height: 600px; padding: 0 14px 14px;}
+
+.timeline-list{position: relative; padding-left: 16px; margin-top: 6px; display: flex; flex-direction: column; gap: 12px;}
+.timeline-list::before{content: ''; position: absolute; left: 4px; top: 4px; bottom: 4px; width: 2px; background: var(--accent); opacity: 0.3;}
+.timeline-item{position: relative; font-size: 11.5px; color: var(--sub);}
+.timeline-item::before{content: ''; position: absolute; left: -16px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--card-bg);}
+.timeline-level{font-weight: 700; color: var(--text); font-size: 12px;}
+.timeline-school{color: var(--text); font-weight: 500;}
+.timeline-achievements{margin: 2px 0 0; padding-left: 12px; font-size: 10.5px; color: var(--sub); list-style-type: disc;}
+
 .infotag{display:inline-block;font-size:12px;font-weight:500;color:var(--text);background:rgba(127,127,127,0.1);border-radius:999px;padding:5px 12px;margin:0 4px 6px 0;}
 
-.contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+/* Centralized Contact Row */
+.contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
 .contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease;}
 .contact-btn:active{transform: scale(0.95);}
 .contact-btn svg{width:14px;height:14px;flex:none;}
@@ -222,7 +239,18 @@ input[type=range]{flex:1;accent-color:var(--accent);}
     <div class="work" id="workEl"></div>
     <div class="worklocation" id="workLocationEl"></div>
     <p class="bio" id="bioEl"></p>
-    <div class="edutag hidden" id="eduTag"></div>
+
+    <!-- Education Roadmap Dropdown -->
+    <div class="eduroadmap-box hidden" id="eduRoadmapBox">
+      <div class="eduroadmap-header" id="eduRoadmapToggle">
+        <span id="eduRoadmapSummary">Education Roadmap</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="eduroadmap-content">
+        <div class="timeline-list" id="timelineListEl"></div>
+      </div>
+    </div>
+
     <div id="extraTagsContainer"></div>
     <div class="contact-row" id="contactRow"></div>
 
@@ -292,11 +320,12 @@ input[type=range]{flex:1;accent-color:var(--accent);}
 
     <div class="note" style="margin-top:10px;">Click your name or bio above to edit them directly.</div>
 
-    <h3 style="margin-top:18px;">Education (optional)</h3>
-    <div class="row"><label>Level</label><select id="eduLevel"><option value="">— Select —</option><option value="High School">High School</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option><option value="Med School">Med School</option><option value="Law School">Law School</option></select></div>
-    <div class="row"><label>School/Course</label><input type="text" id="eduSchool" placeholder="e.g. BS Computer Science"></div>
-    <div class="row"><label>Year</label><input type="text" id="eduYear" placeholder="e.g. 3rd Year"></div>
-    <div class="row"><label>Section</label><input type="text" id="eduSection" placeholder="optional, e.g. Section A"></div>
+    <h3 style="margin-top:18px;">Education Roadmap</h3>
+    <div id="educationList"></div>
+    <div class="row"><label>Level</label><select id="eduLevelInput"><option value="Elementary">Elementary</option><option value="Junior High">Junior High</option><option value="Senior High">Senior High</option><option value="College">College</option><option value="Masteral">Masteral</option><option value="Doctoral">Doctoral</option></select></div>
+    <div class="row"><label>School</label><input type="text" id="eduSchoolInput" placeholder="School name & degree"></div>
+    <div class="row"><label>Achievements</label><input type="text" id="eduAchieveInput" placeholder="Comma separated achievements"></div>
+    <button class="btn" id="addEduBtn" style="width:100%; margin-bottom:12px;">Add Education Milestone</button>
 
     <h3 style="margin-top:18px;">Languages &amp; Hobbies (optional)</h3>
     <div class="row"><label>Languages</label><input type="text" id="languagesInput" placeholder="e.g. English, Tagalog, Bahasa Indonesia"></div>
@@ -410,7 +439,7 @@ const DEFAULT_STATE = {
   name:"Your Name", bio:"Tap a link below to connect with me.",
   avatar:"", cover:"", coverOpacity:0.55, themeKey:"clean-light",
   layoutStyle:"list", iconStyle:"brand", photos:[], workCityCountry:"",
-  education:"", eduYear:"", eduSection:"", eduLevel:"", languages:"", hobbies:"", phone:"", email:"", 
+  educationMilestones: [], languages:"", hobbies:"", phone:"", email:"", 
   qrName:"", qrImage:"", avatarScale: 100, coverScale: 100, work:[], links:[]
 };
 
@@ -499,11 +528,44 @@ function render(){
   document.getElementById('nameEl').textContent = state.name;
   document.getElementById('bioEl').textContent = state.bio;
   
-  const eduParts = [state.eduLevel, state.education, state.eduYear, state.eduSection].filter(Boolean);
-  const eduEl = document.getElementById('eduTag');
-  eduEl.style.setProperty('--tagcolor', t.accent);
-  if(eduParts.length){ eduEl.textContent = eduParts.join(' • '); eduEl.classList.remove('hidden'); } else { eduEl.classList.add('hidden'); }
-  
+  // Education Roadmap
+  const eduBox = document.getElementById('eduRoadmapBox');
+  const eduSummary = document.getElementById('eduRoadmapSummary');
+  const timelineList = document.getElementById('timelineListEl');
+  const milestones = state.educationMilestones || [];
+
+  if (milestones.length > 0) {
+    eduBox.classList.remove('hidden');
+    const latest = milestones[milestones.length - 1];
+    eduSummary.textContent = `${latest.level}: ${latest.school}`;
+
+    timelineList.innerHTML = milestones.map(m => {
+      const achieveList = m.achievements ? m.achievements.split(',').map(a => `<li>${a.trim()}</li>`).join('') : '';
+      return `
+        <div class="timeline-item">
+          <div class="timeline-level">${m.level}</div>
+          <div class="timeline-school">${m.school}</div>
+          ${achieveList ? `<ul class="timeline-achievements">${achieveList}</ul>` : ''}
+        </div>
+      `;
+    }).join('');
+  } else {
+    eduBox.classList.add('hidden');
+  }
+
+  // Edit Panel Education List
+  const educationListDiv = document.getElementById('educationList');
+  educationListDiv.innerHTML = milestones.map((m, idx) => `
+    <div class="worklistitem">
+      <span><b>${m.level}</b>: ${m.school}</span>
+      <span class="rm" data-i="${idx}">×</span>
+    </div>
+  `).join('');
+  educationListDiv.querySelectorAll('.rm').forEach(el => el.onclick = () => {
+    state.educationMilestones.splice(+el.dataset.i, 1);
+    render();
+  });
+
   const extraContainer = document.getElementById('extraTagsContainer');
   let extraHtml = '';
   if (state.languages) extraHtml += `<div class="infotag">Languages: ${state.languages}</div>`;
@@ -600,10 +662,6 @@ function render(){
   document.getElementById('layoutStyleSel').value = state.layoutStyle || 'list';
   document.getElementById('iconStyleSel').value = state.iconStyle || 'brand';
   document.getElementById('workCityCountry').value = state.workCityCountry || '';
-  document.getElementById('eduSchool').value = state.education || '';
-  document.getElementById('eduYear').value = state.eduYear || '';
-  document.getElementById('eduSection').value = state.eduSection || '';
-  document.getElementById('eduLevel').value = state.eduLevel || '';
   document.getElementById('languagesInput').value = state.languages || '';
   document.getElementById('hobbiesInput').value = state.hobbies || '';
   document.getElementById('phoneInput').value = state.phone || '';
@@ -657,7 +715,6 @@ async function handleNfcCardBinding() {
   if (!cardUid) cardUid = sessionStorage.getItem('pending_lynq_card');
 
   if (!cardUid) {
-    // Replaced error text with friendly loading/guidance screen message
     const loaderText = document.getElementById('loaderTextEl');
     if (loaderText) {
       loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
@@ -735,6 +792,10 @@ async function init(){
     if(loaderText) loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
   });
 
+  document.getElementById('eduRoadmapToggle').addEventListener('click', () => {
+    document.getElementById('eduRoadmapBox').classList.toggle('open');
+  });
+
   document.getElementById('shareBtn').addEventListener('click', async () => {
     const shareData = {
       title: state.name ? `${state.name}'s LYNQ Profile` : 'LYNQ Profile',
@@ -775,10 +836,6 @@ async function init(){
   document.getElementById('layoutStyleSel').addEventListener('change', e=>{ state.layoutStyle = e.target.value; render(); });
   document.getElementById('iconStyleSel').addEventListener('change', e=>{ state.iconStyle = e.target.value; render(); });
   document.getElementById('workCityCountry').addEventListener('input', e=>{ state.workCityCountry = e.target.value; render(); });
-  document.getElementById('eduSchool').addEventListener('input', e=>{ state.education = e.target.value; render(); });
-  document.getElementById('eduYear').addEventListener('input', e=>{ state.eduYear = e.target.value; render(); });
-  document.getElementById('eduSection').addEventListener('input', e=>{ state.eduSection = e.target.value; render(); });
-  document.getElementById('eduLevel').addEventListener('change', e=>{ state.eduLevel = e.target.value; render(); });
   document.getElementById('languagesInput').addEventListener('input', e=>{ state.languages = e.target.value; render(); });
   document.getElementById('hobbiesInput').addEventListener('input', e=>{ state.hobbies = e.target.value; render(); });
   document.getElementById('phoneInput').addEventListener('input', e=>{ state.phone = e.target.value; render(); });
@@ -821,6 +878,18 @@ async function init(){
     drawer.classList.toggle('open');
     const btn = document.getElementById('toggleNoteBtn');
     btn.textContent = drawer.classList.contains('open') ? 'Cancel' : 'Leave a note';
+  });
+
+  document.getElementById('addEduBtn').addEventListener('click', () => {
+    const level = document.getElementById('eduLevelInput').value;
+    const school = document.getElementById('eduSchoolInput').value.trim();
+    const achievements = document.getElementById('eduAchieveInput').value.trim();
+    if (!school) return;
+    state.educationMilestones = state.educationMilestones || [];
+    state.educationMilestones.push({ level, school, achievements });
+    document.getElementById('eduSchoolInput').value = '';
+    document.getElementById('eduAchieveInput').value = '';
+    render();
   });
 
   document.getElementById('addWorkBtn').addEventListener('click', ()=>{
