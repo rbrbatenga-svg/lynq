@@ -37,7 +37,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 .wrap{max-width:460px;margin:0 auto;padding:0 18px 60px;width:100%;}
 
-/* iPhone Glassmorphism Card Style */
 .card{
   background: var(--card-bg);
   backdrop-filter: blur(20px);
@@ -87,7 +86,6 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .worklistitem .rm{margin-left:auto;color:#d33;font-weight:700;cursor:pointer;}
 [contenteditable="true"]{outline:2px dashed var(--accent);border-radius:6px;padding:2px 4px;}
 
-/* Links Layout Styles */
 .links.list-layout{display:flex;flex-direction:column;gap:10px;}
 .links.list-layout .linkbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--card-bg);backdrop-filter:blur(10px);
   text-decoration:none;color:var(--text);font-weight:600;font-size:15px;border:1px solid rgba(127,127,127,.15);width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.03);transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);}
@@ -111,7 +109,6 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
   box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:20;display:flex;align-items:center;gap:6px;}
 .inbox-fab svg{width:16px;height:16px;stroke:#ffffff;fill:none;}
 
-/* Modern iOS Sheet / Panel UI */
 .panel{background:var(--card-bg);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-radius:20px;padding:20px;margin-top:16px;border:1px solid var(--border);width:100%;box-shadow:0 15px 35px rgba(0,0,0,0.1);}
 .panel h3{margin:0 0 12px;font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px;font-weight:700;}
 .panel h3 svg{width:16px;height:16px;stroke:var(--sub);fill:none;}
@@ -130,7 +127,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
 .note-section{margin-top:24px;border-top:1px solid rgba(127,127,127,.15);padding-top:16px;}
 .note{font-size:12px;color:var(--sub);margin-top:4px;}
 .hidden{display:none !important;}
-.status{font-size:12px;color:#d33;text-align:center;margin-top:10px;white-space:pre-wrap;}
 
 .auth-prompt{font-size:13px; color:var(--sub); text-align:center; margin-top:20px; display:block; position:relative; z-index:10;}
 .auth-prompt a{color:var(--accent); text-decoration:underline; font-weight:600; cursor:pointer;}
@@ -143,11 +139,13 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   position: fixed; inset: 0; background: var(--bg); z-index: 9999;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 20px;
+  text-align: center;
 }
-.loader-content {display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;}
-.loader-logo {display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: .05em;}
-.loader-logo svg {width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 2.2;}
-.loader-text {font-size: 12px; font-weight: 500; color: var(--sub);}
+.loader-content {display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 320px;}
+.loader-logo {display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: .05em;}
+.loader-logo svg {width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 2.2;}
+.loader-text {font-size: 13.5px; font-weight: 500; color: var(--sub); line-height: 1.5;}
 
 .note-drawer {max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; opacity: 0;}
 .note-drawer.open {max-height: 250px; opacity: 1; margin-top: 10px;}
@@ -156,7 +154,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
 .theme-card {display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(127,127,127,0.2); background: var(--card-bg); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text);}
 .theme-preview {width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.15);}
 
-/* iOS-style Modal Popups */
 .modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -195,7 +192,7 @@ input[type=range]{flex:1;accent-color:var(--accent);}
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       LYNQ
     </div>
-    <div class="loader-text" id="loaderTextEl">Loading portfolio</div>
+    <div class="loader-text" id="loaderTextEl">Please tap your LYNQ card or paste your LYNQ portfolio exact URL.</div>
   </div>
 </div>
 
@@ -349,7 +346,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   <a class="switch-account-link hidden" id="switchAccountBtn">Switch to different LYNQ account</a>
 </div>
 
-<!-- Modal Popup Container for Gallery -->
 <div class="modal-overlay" id="galleryModal">
   <div class="modal-body">
     <span class="modal-close" id="closeGalleryBtn">&times;</span>
@@ -358,7 +354,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   </div>
 </div>
 
-<!-- Modal Popup Container for Payment QR -->
 <div class="modal-overlay" id="qrModal">
   <div class="modal-body">
     <span class="modal-close" id="closeQrBtn">&times;</span>
@@ -367,7 +362,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
   </div>
 </div>
 
-<!-- Modal Popup Container for Info Guide -->
 <div class="modal-overlay" id="infoModal">
   <div class="modal-body" style="text-align: left;">
     <span class="modal-close" id="closeInfoBtn">&times;</span>
@@ -422,10 +416,6 @@ const DEFAULT_STATE = {
 
 let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let editing = false, isOwner = false, currentCardUid = null;
-
-function showError(msg) {
-  document.getElementById('globalErrorEl').textContent = msg;
-}
 
 function applyThemePreset(key) {
   const t = THEMES[key] || THEMES['clean-light'];
@@ -667,10 +657,11 @@ async function handleNfcCardBinding() {
   if (!cardUid) cardUid = sessionStorage.getItem('pending_lynq_card');
 
   if (!cardUid) {
-    showError("Missing card parameter in URL. Please tap a valid LYNQ card.");
-    const loader = document.getElementById('loadingScreen');
-    if(loader) loader.style.opacity = '0';
-    setTimeout(() => loader?.remove(), 400);
+    // Replaced error text with friendly loading/guidance screen message
+    const loaderText = document.getElementById('loaderTextEl');
+    if (loaderText) {
+      loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
+    }
     return;
   }
   currentCardUid = cardUid;
@@ -678,8 +669,10 @@ async function handleNfcCardBinding() {
   const { data: cardRecord, error } = await supabaseClient.from('nfc_cards').select('*').eq('nfc_uid', cardUid).single();
 
   if (error || !cardRecord) {
-    showError("Card ID '" + cardUid + "' not found or database error.");
-    render();
+    const loaderText = document.getElementById('loaderTextEl');
+    if (loaderText) {
+      loaderText.textContent = "Card not found. Please verify your LYNQ card link.";
+    }
     return;
   }
 
@@ -719,8 +712,6 @@ async function handleNfcCardBinding() {
         promptBtn.classList.add('hidden');
         switchAccountBtn.classList.remove('hidden');
         fetchInboxNotes();
-      } else {
-        showError("Failed to claim card: " + updateErr.message);
       }
     }
   } else {
@@ -740,9 +731,8 @@ async function init(){
   populatePlatforms();
   toggleCustomLabel();
   await handleNfcCardBinding().catch(err => {
-    showError("Init error: " + err.message);
-    const loader = document.getElementById('loadingScreen');
-    if(loader) loader.remove();
+    const loaderText = document.getElementById('loaderTextEl');
+    if(loaderText) loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
   });
 
   document.getElementById('shareBtn').addEventListener('click', async () => {
@@ -900,7 +890,6 @@ async function init(){
     const { data: { session } } = await supabaseClient.auth.getSession();
     const visitorEmail = session?.user?.email || 'Anonymous Visitor';
 
-    const { error } = await supabaseClient.from('nfc_cards').select('*'); // dummy check
     const { error: insErr } = await supabaseClient.from('card_notes').insert({ card_uid: currentCardUid, message: msg, visitor_email: visitorEmail });
 
     if(insErr) {
