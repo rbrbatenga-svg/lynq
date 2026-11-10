@@ -71,7 +71,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap;}
 
-/* Education Roadmap Dropdown styles */
 .eduroadmap-box{margin: 10px 0 14px; background: rgba(127,127,127,0.06); border: 1px solid rgba(127,127,127,0.15); border-radius: 14px; overflow: hidden;}
 .eduroadmap-header{display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);}
 .eduroadmap-header svg{width: 14px; height: 14px; stroke: var(--accent); transition: transform 0.3s ease;}
@@ -88,11 +87,12 @@ h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight: 700;}
 .timeline-subinfo{color: var(--sub); font-size: 11px; margin-top: 1px;}
 .timeline-achievements{margin: 2px 0 0; padding-left: 12px; font-size: 10.5px; color: var(--sub); list-style-type: disc;}
 
-/* Individual Centralized Floating Bubbles for Languages & Hobbies */
-.chips-container{display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0;}
-.chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 5px 12px; backdrop-filter: blur(8px);}
+/* Left-aligned Languages & Hobbies with individual chip bubbles */
+.extra-section-container{margin: 12px 0; text-align: left; display: flex; flex-direction: column; gap: 8px;}
+.extra-row{display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12px;}
+.extra-label{font-weight: 600; color: var(--sub); flex: none; margin-right: 2px;}
+.chip-bubble{font-size: 11.5px; font-weight: 500; color: var(--text); background: rgba(127,127,127,0.1); border: 1px solid rgba(127,127,127,0.15); border-radius: 999px; padding: 4px 11px; backdrop-filter: blur(8px);}
 
-/* Centralized Contact Row */
 .contact-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
 .contact-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(127,127,127,.15);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.04);transition: transform 0.2s ease;}
 .contact-btn:active{transform: scale(0.95);}
@@ -167,6 +167,18 @@ input[type=range]{flex:1;accent-color:var(--accent);}
 .loader-logo svg {width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 2.2;}
 .loader-text {font-size: 13.5px; font-weight: 500; color: var(--sub); line-height: 1.5;}
 
+.dots-loader span {
+  display: inline-block;
+  animation: wave 1.4s infinite ease-in-out;
+}
+.dots-loader span:nth-child(2) { animation-delay: 0.2s; }
+.dots-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes wave {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+
 .note-drawer {max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; opacity: 0;}
 .note-drawer.open {max-height: 250px; opacity: 1; margin-top: 10px;}
 
@@ -212,7 +224,9 @@ input[type=range]{flex:1;accent-color:var(--accent);}
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       LYNQ
     </div>
-    <div class="loader-text" id="loaderTextEl">Please tap your LYNQ card or paste your LYNQ portfolio exact URL.</div>
+    <div class="loader-text" id="loaderTextEl">
+      Loading information, please wait<span class="dots-loader"><span>.</span><span>.</span><span>.</span></span>
+    </div>
   </div>
 </div>
 
@@ -243,7 +257,6 @@ input[type=range]{flex:1;accent-color:var(--accent);}
     <div class="worklocation" id="workLocationEl"></div>
     <p class="bio" id="bioEl"></p>
 
-    <!-- Education Roadmap Dropdown -->
     <div class="eduroadmap-box hidden" id="eduRoadmapBox">
       <div class="eduroadmap-header" id="eduRoadmapToggle">
         <span id="eduRoadmapSummary">Education Roadmap</span>
@@ -542,12 +555,10 @@ function render(){
   document.getElementById('nameEl').textContent = state.name;
   document.getElementById('bioEl').textContent = state.bio;
   
-  // Sort education milestones by rank highest first (Doctoral -> Masteral -> College -> ...)
   if (state.educationMilestones && state.educationMilestones.length > 0) {
     state.educationMilestones.sort((a, b) => (EDU_RANKS[b.level] || 0) - (EDU_RANKS[a.level] || 0));
   }
 
-  // Education Roadmap
   const eduBox = document.getElementById('eduRoadmapBox');
   const eduSummary = document.getElementById('eduRoadmapSummary');
   const timelineList = document.getElementById('timelineListEl');
@@ -555,7 +566,7 @@ function render(){
 
   if (milestones.length > 0) {
     eduBox.classList.remove('hidden');
-    const highest = milestones[0]; // Highest is on top
+    const highest = milestones[0];
     eduSummary.textContent = `${highest.level}: ${highest.school} (${highest.program || highest.year || ''})`;
 
     timelineList.innerHTML = milestones.map(m => {
@@ -573,7 +584,6 @@ function render(){
     eduBox.classList.add('hidden');
   }
 
-  // Edit Panel Education List
   const educationListDiv = document.getElementById('educationList');
   educationListDiv.innerHTML = milestones.map((m, idx) => `
     <div class="worklistitem">
@@ -586,16 +596,24 @@ function render(){
     render();
   });
 
-  // Languages & Hobbies individual centralized bubbles
+  // Separate, left-aligned Languages and Hobbies rows
   const extraContainer = document.getElementById('extraTagsContainer');
   let extraHtml = '';
   const langs = (state.languages || '').split(',').map(s => s.trim()).filter(Boolean);
   const hobs = (state.hobbies || '').split(',').map(s => s.trim()).filter(Boolean);
   
   if (langs.length > 0 || hobs.length > 0) {
-    extraHtml += `<div class="chips-container">`;
-    langs.forEach(l => { extraHtml += `<div class="chip-bubble">${l}</div>`; });
-    hobs.forEach(h => { extraHtml += `<div class="chip-bubble">${h}</div>`; });
+    extraHtml += `<div class="extra-section-container">`;
+    if (langs.length > 0) {
+      extraHtml += `<div class="extra-row"><span class="extra-label">Languages:</span>`;
+      langs.forEach(l => { extraHtml += `<div class="chip-bubble">${l}</div>`; });
+      extraHtml += `</div>`;
+    }
+    if (hobs.length > 0) {
+      extraHtml += `<div class="extra-row"><span class="extra-label">Hobbies:</span>`;
+      hobs.forEach(h => { extraHtml += `<div class="chip-bubble">${h}</div>`; });
+      extraHtml += `</div>`;
+    }
     extraHtml += `</div>`;
   }
   extraContainer.innerHTML = extraHtml;
@@ -745,7 +763,7 @@ async function handleNfcCardBinding() {
   if (!cardUid) {
     const loaderText = document.getElementById('loaderTextEl');
     if (loaderText) {
-      loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
+      loaderText.innerHTML = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
     }
     return;
   }
@@ -756,7 +774,7 @@ async function handleNfcCardBinding() {
   if (error || !cardRecord) {
     const loaderText = document.getElementById('loaderTextEl');
     if (loaderText) {
-      loaderText.textContent = "Card not found. Please verify your LYNQ card link.";
+      loaderText.innerHTML = "Card not found. Please verify your LYNQ card link.";
     }
     return;
   }
@@ -817,7 +835,7 @@ async function init(){
   toggleCustomLabel();
   await handleNfcCardBinding().catch(err => {
     const loaderText = document.getElementById('loaderTextEl');
-    if(loaderText) loaderText.textContent = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
+    if(loaderText) loaderText.innerHTML = "Please tap your LYNQ card or paste your LYNQ portfolio exact URL.";
   });
 
   document.getElementById('eduRoadmapToggle').addEventListener('click', () => {
