@@ -959,18 +959,17 @@ async function handleNfcCardBinding() {
       switchAccountBtn.classList.remove('hidden');
       fetchInboxNotes();
     } else if (!cardRecord.user_id) {
-      // Claiming a new card with an existing session: check for previous cards owned by this user
+      // Find any existing card already owned by this user account
       const { data: userCards } = await supabaseClient
         .from('nfc_cards')
         .select('*')
         .eq('user_id', session.user.id)
-        .neq('nfc_uid', cardUid)
         .order('created_at', { ascending: false });
 
       let profilePayloadToSync = cardRecord.bio;
       let cardTitleToSync = cardRecord.card_title;
 
-      // If user already owns an older card with profile data, copy it to the new card
+      // If the user already has cards with profile data, inherit from their most recent profile
       if (userCards && userCards.length > 0) {
         const existingCard = userCards.find(c => c.bio);
         if (existingCard && existingCard.bio) {
@@ -987,7 +986,7 @@ async function handleNfcCardBinding() {
         }
       }
 
-      // Claim card and sync profile data automatically
+      // Claim the new card and sync existing profile data instantly
       const { error: updateErr } = await supabaseClient
         .from('nfc_cards')
         .update({ 
