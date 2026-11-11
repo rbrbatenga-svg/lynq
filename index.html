@@ -932,6 +932,7 @@ async function handleNfcCardBinding() {
     return;
   }
 
+  // Load existing profile from current card if present
   if (cardRecord.bio) {
     try {
       const parsed = JSON.parse(cardRecord.bio);
@@ -943,7 +944,6 @@ async function handleNfcCardBinding() {
       if (cardRecord.card_title) state.name = cardRecord.card_title;
     }
   }
-  render();
 
   const promptBtn = document.getElementById('authPromptBtn');
   const signInLink = document.getElementById('signInLink');
@@ -959,7 +959,44 @@ async function handleNfcCardBinding() {
       switchAccountBtn.classList.remove('hidden');
       fetchInboxNotes();
     } else if (!cardRecord.user_id) {
-      const { error: updateErr } = await supabaseClient.from('nfc_cards').update({ user_id: session.user.id }).eq('nfc_uid', cardUid);
+      // Claiming a new card with an existing session: check for previous cards owned by this user
+      const { data: userCards } = await supabaseClient
+        .from('nfc_cards')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .neq('nfc_uid', cardUid)
+        .order('created_at', { ascending: false });
+
+      let profilePayloadToSync = cardRecord.bio;
+      let cardTitleToSync = cardRecord.card_title;
+
+      // If user already owns an older card with profile data, copy it to the new card
+      if (userCards && userCards.length > 0) {
+        const existingCard = userCards.find(c => c.bio);
+        if (existingCard && existingCard.bio) {
+          profilePayloadToSync = existingCard.bio;
+          cardTitleToSync = existingCard.card_title || state.name;
+          try {
+            const parsed = JSON.parse(existingCard.bio);
+            if (parsed && typeof parsed === 'object') {
+              state = { ...DEFAULT_STATE, ...parsed };
+            }
+          } catch (_e) {
+            state.bio = existingCard.bio;
+          }
+        }
+      }
+
+      // Claim card and sync profile data automatically
+      const { error: updateErr } = await supabaseClient
+        .from('nfc_cards')
+        .update({ 
+          user_id: session.user.id,
+          bio: profilePayloadToSync,
+          card_title: cardTitleToSync
+        })
+        .eq('nfc_uid', cardUid);
+
       if (!updateErr) {
         isOwner = true;
         document.getElementById('editFab').classList.remove('hidden');
@@ -981,6 +1018,8 @@ async function handleNfcCardBinding() {
       });
     };
   }
+
+  render();
 }
 
 async function init(){
