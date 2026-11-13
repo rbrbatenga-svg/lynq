@@ -32,7 +32,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .share-btn,.info-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(127,127,127,.2);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);cursor:pointer;margin-bottom:6px;transition:transform .2s cubic-bezier(.16,1,.3,1)}
 .share-btn:active,.info-btn:active{transform:scale(.92)}
 .share-btn svg,.info-btn svg{width:16px;height:16px;stroke:var(--accent);fill:none}
-.avatar-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-bottom:6px}
+.avatar-right{position:absolute;top:12px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin:0;z-index:2}
 .gallery-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid rgba(127,127,127,.2);background:var(--card-bg);backdrop-filter:blur(10px);color:var(--text);cursor:pointer}
 .gallery-btn svg{width:13px;height:13px;flex:none;stroke:var(--accent)}
 /* tap counter pill: theme-matched border that flows like a wave */
@@ -40,6 +40,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tap-pill svg{width:13px;height:13px;stroke:var(--accent);fill:none;flex:none}
 .tap-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:var(--wave);background-size:200% 100%;background-repeat:repeat-x;animation:waveflow 3.6s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;pointer-events:none}
 @keyframes waveflow{to{background-position:200% 0}}
+.gallery-btn,.tap-pill{width:104px;height:26px;padding:0 8px;justify-content:center;white-space:nowrap;line-height:1}
 h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight:700}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap}
 .eduroadmap-box{margin:10px 0 14px;background:rgba(127,127,127,.06);border:1px solid rgba(127,127,127,.15);border-radius:14px;overflow:hidden}
