@@ -40,11 +40,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tap-pill svg{width:13px;height:13px;stroke:var(--accent);fill:none;flex:none}
 .tap-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:var(--wave);background-size:200% 100%;background-repeat:repeat-x;animation:waveflow 3.6s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;pointer-events:none}
 @keyframes waveflow{to{background-position:200% 0}}
-.tap-pill{height:22px;padding:0 9px;font-size:10.5px;white-space:nowrap;line-height:1}
-.tap-pill svg{width:12px!important;height:12px!important}
-.gallery-btn{width:22px;height:22px;padding:0;gap:0;font-size:0;justify-content:center}
-.gallery-btn svg{width:12px!important;height:12px!important}
-@media(max-width:360px){.tap-pill .tl{display:none}.share-btn,.info-btn{width:30px;height:30px}}
+.tap-pill{height:28px;padding:0 11px;font-size:12px;white-space:nowrap;line-height:1}
+.tap-pill svg{width:14px!important;height:14px!important}
+.gallery-btn{width:28px;height:28px;padding:0;gap:0;font-size:0;justify-content:center}
+.gallery-btn svg{width:15px!important;height:15px!important}
+.mini-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.share-btn,.info-btn{width:24px;height:24px;margin-bottom:0}
+.share-btn svg,.info-btn svg{width:13px!important;height:13px!important}
+@media(max-width:330px){.tap-pill .tl{display:none}}
 h1{font-size:22px;margin:8px 0 4px;color:var(--text);font-weight:700}
 .bio{color:var(--sub);font-size:14px;margin:0 0 10px;white-space:pre-wrap}
 .eduroadmap-box{margin:10px 0 14px;background:rgba(127,127,127,.06);border:1px solid rgba(127,127,127,.15);border-radius:14px;overflow:hidden}
@@ -246,12 +249,13 @@ const THEMES={
     <div class="avatar-row">
       <div class="avatar-left-group">
         <div class="avatar" id="avatarContainer"><img id="avatarImg" src="" alt="" style="display:none"><span id="avatarInitials"></span></div>
-        <button class="share-btn" id="shareBtn" title="Share Portfolio"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
-        <button class="info-btn" id="infoBtn" title="Help Guide"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+        <div class="mini-row"><div class="tap-pill" id="tapPill"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg><span id="tapText">0 taps</span></div><button class="gallery-btn hidden" id="openGalleryBtn" title="Gallery" aria-label="Gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Gallery</button></div>
+        
+        
       </div>
-      <div class="avatar-right">
-        <div class="tap-pill" id="tapPill"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg><span id="tapText">0 taps</span></div>
-        <button class="gallery-btn hidden" id="openGalleryBtn" title="Gallery" aria-label="Gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Gallery</button>
+      <div class="avatar-right"><button class="share-btn" id="shareBtn" title="Share Portfolio"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button><button class="info-btn" id="infoBtn" title="Help Guide"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+        
+        
       </div>
     </div>
     <h1 id="nameEl"></h1>
