@@ -49,7 +49,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .share-btn svg,.info-btn svg{width:13px!important;height:13px!important}
 @media(max-width:330px){.tap-pill .tl{display:none}}
 .no-taps .gallery-btn{width:auto;height:28px;padding:0 12px;gap:6px;font-size:12px}
-.row label.switch{position:relative;display:inline-block;width:46px;min-width:46px;height:28px;flex:none}
+.ed .li label.switch{position:relative;display:inline-block;width:46px;min-width:46px;height:28px;flex:none}
 .switch input{opacity:0;width:0;height:0;position:absolute}
 .switch .slider{position:absolute;inset:0;background:rgba(127,127,127,.35);border-radius:99px;transition:background .25s;cursor:pointer}
 .switch .slider::before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:transform .25s cubic-bezier(.16,1,.3,1)}
@@ -180,6 +180,9 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 select.gfield option{color:#111}
 textarea.gfield{min-height:110px;resize:none}
 .fine{font-size:11px!important;opacity:.8}.fine a{color:#9db4ff}
+.fgrp{width:100%;display:flex;flex-direction:column;gap:8px}
+.gfield.sm{padding:9px 12px;border-radius:12px;font-size:16px;line-height:1.2}
+#flowBody .hint{font-size:12px;line-height:1.45;color:rgba(255,255,255,.5);text-align:left;margin:2px 2px 0}
 .dots{display:flex;gap:6px;margin-bottom:6px}.dots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.2);transition:all .4s}.dots i.on{width:22px;background:#7c8cff}
 .pv{width:132px;height:132px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#4472C4,#7c5cff);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;border:1px solid rgba(255,255,255,.25);box-shadow:0 18px 40px rgba(0,0,0,.45);cursor:pointer;margin:6px 0}
 .pv img{width:100%;height:100%;object-fit:cover}
@@ -230,6 +233,50 @@ textarea.gfield{min-height:110px;resize:none}
 .sheet-body p{margin:0 0 9px}.sheet-body ul{margin:0 0 9px;padding-left:18px}.sheet-body li{margin-bottom:5px}
 .sheet-body b{color:#fff}
 .sheet-foot{padding:12px 20px 16px}
+/* ===== editor (iOS-style grouped settings) ===== */
+.ed{margin-top:16px}
+.ed-head{padding:2px 6px 12px}.ed-head h2{margin:0;font-size:22px;letter-spacing:-.02em}.ed-head p{margin:2px 0 0;font-size:13px;color:var(--sub)}
+.sec{background:var(--card-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:22px;margin-bottom:12px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.07)}
+.sec>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;font-weight:700;font-size:15px;color:var(--text)}
+.sec>summary::-webkit-details-marker{display:none}
+.sec .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+.sec .ic svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sec .chev{margin-left:auto;width:16px;height:16px;color:var(--sub);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.sec[open] .chev{transform:rotate(180deg)}
+.sec-body{padding:2px 14px 16px;display:flex;flex-direction:column;gap:12px}
+.sec[open] .sec-body{animation:secin .4s cubic-bezier(.16,1,.3,1)}
+@keyframes secin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.sub-t{font-size:12px;font-weight:600;color:var(--sub);margin:2px 4px -4px}
+.grp{background:rgba(127,127,127,.1);border-radius:16px;overflow:hidden}
+.li{display:flex;align-items:center;gap:10px;padding:0 14px;min-height:46px;border-bottom:1px solid rgba(127,127,127,.14)}
+.li:last-child{border-bottom:0}
+.li.hidden{display:none}
+.ed .li label:not(.switch):not(.pb){font-size:14px;font-weight:500;color:var(--text);min-width:78px;flex:none}
+.ed .li input:not([type=range]):not([type=checkbox]),.ed .li select{flex:1;min-width:0;border:0;background:transparent;text-align:right;text-align-last:right;font-size:16px;padding:12px 0;color:var(--text);border-radius:0;outline:none;-webkit-appearance:none;appearance:none}
+.ed .li input:focus,.ed .li select:focus{border:0;background:transparent;color:var(--accent)}
+.ed .li input::placeholder{color:var(--sub);opacity:.55}
+.ed .li input[type=range]{flex:1}
+.thumb{width:34px;height:34px;border-radius:50%;background:var(--accent) center/cover;flex:none;border:1px solid rgba(127,127,127,.25)}
+.thumb.wide{width:52px;height:30px;border-radius:9px}
+.ed label.pb{margin-left:auto;font-size:13px;font-weight:700;color:var(--accent);background:rgba(127,127,127,.16);padding:7px 14px;border-radius:99px;cursor:pointer}
+.ed label.pb:active{transform:scale(.95)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{aspect-ratio:1;border-radius:16px;background:rgba(127,127,127,.12) center/cover;border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:transform .2s}
+.tile:active{transform:scale(.96)}.tile svg{width:22px;height:22px}.tile.has{border-style:solid}.tile.has svg{display:none}
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 6px}
+.sw{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--sub);text-align:center;cursor:pointer;line-height:1.2}
+.sw i{width:44px;height:44px;border-radius:50%;box-shadow:0 0 0 1px rgba(127,127,127,.3);transition:box-shadow .25s,transform .25s}
+.sw.on i{box-shadow:0 0 0 2.5px var(--card-bg),0 0 0 5px var(--accent);transform:scale(.92)}
+.sw.on{color:var(--text);font-weight:600}
+.seg{display:flex;background:rgba(127,127,127,.16);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:none;padding:9px 6px;border-radius:9px;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;transition:background .25s,color .25s}
+.seg button.on{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.ed .btn{width:100%;border-radius:14px;padding:13px 16px}
+.ed .worklistitem{background:rgba(127,127,127,.1);border:0;border-radius:12px;padding:10px 14px;margin-bottom:6px}
+.actionbar{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:15;margin-top:16px;padding:10px;border-radius:24px;background:var(--card-bg);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--border);box-shadow:0 14px 36px rgba(0,0,0,.2)}
+.arow{display:flex;gap:8px}.arow .btn.secondary{width:34%}
+#statusEl{font-size:12px;text-align:center;color:var(--sub);padding:0 4px 8px}#statusEl:empty{display:none}
+body.editing .floating-actions{display:none}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 <script>
@@ -301,63 +348,32 @@ const THEMES={
     <div id="globalErrorEl"></div>
   </div>
 
-  <div class="panel hidden" id="editPanel">
-    <h3>Profile &amp; Layout</h3>
-    <div class="row"><label>Avatar</label><input type="file" id="avatarFile" accept="image/*"></div>
-    <div class="row"><label>Cover photo</label><input type="file" id="coverFile" accept="image/*"></div>
-    <div class="row"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div>
-    <h3 style="margin-top:18px">Aesthetic Color Presets</h3>
-    <div class="theme-grid">
-      <div class="theme-card" onclick="applyThemePreset('clean-light')"><div class="theme-preview" style="background:#4472C4"></div>Clean Light</div>
-      <div class="theme-card" onclick="applyThemePreset('black-gray')"><div class="theme-preview" style="background:linear-gradient(135deg,#242424,#0d0d0d)"></div>Black &amp; Gray</div>
-      <div class="theme-card" onclick="applyThemePreset('white-pink')"><div class="theme-preview" style="background:linear-gradient(135deg,#ff80bf,#ffb3d9)"></div>White &amp; Pink</div>
-      <div class="theme-card" onclick="applyThemePreset('white-black')"><div class="theme-preview" style="background:linear-gradient(135deg,#334155,#0f172a)"></div>White &amp; Black</div>
-      <div class="theme-card" onclick="applyThemePreset('lgbt-pride')"><div class="theme-preview" style="background:linear-gradient(90deg,red,orange,yellow,green,blue,purple)"></div>LGBT Pride</div>
-      <div class="theme-card" onclick="applyThemePreset('midnight-blue')"><div class="theme-preview" style="background:linear-gradient(135deg,#1e40af,#1e1b4b)"></div>Midnight Blue</div>
-      <div class="theme-card" onclick="applyThemePreset('emerald-dark')"><div class="theme-preview" style="background:linear-gradient(135deg,#047857,#064e3b)"></div>Emerald Dark</div>
-      <div class="theme-card" onclick="applyThemePreset('sunset-amber')"><div class="theme-preview" style="background:linear-gradient(135deg,#d97706,#b45309)"></div>Sunset Amber</div>
-    </div>
-    <h3 style="margin-top:18px">Icon Style Options</h3>
-    <div class="row"><label>Icon Colors</label><select id="iconStyleSel"><option value="brand">Authentic Brand Colors</option><option value="match">Match Theme Accent</option></select></div>
-    <h3 style="margin-top:18px">Work City &amp; Country</h3>
-    <div class="row"><label>City, Country</label><input type="text" id="workCityCountry" placeholder="e.g. Davao City, Philippines"></div>
-    <h3 style="margin-top:18px">Portfolio Photos (3 max)</h3>
-    <div class="row"><label>Photo 1</label><input type="file" id="photoFile1" accept="image/*"></div>
-    <div class="row"><label>Photo 2</label><input type="file" id="photoFile2" accept="image/*"></div>
-    <div class="row"><label>Photo 3</label><input type="file" id="photoFile3" accept="image/*"></div>
-    <h3 style="margin-top:18px">Taps Counter</h3>
-    <div class="row"><label for="showTapsSw" style="flex:1">Show taps on my profile</label><label class="switch"><input type="checkbox" id="showTapsSw"><span class="slider"></span></label></div>
-    <div class="note" style="margin:-4px 0 12px">When off, the taps pill is hidden and the Gallery button shows its full label. Taps are still counted.</div>
-    <h3 style="margin-top:18px">Links Display Style</h3>
-    <div class="row"><label>Layout</label><select id="layoutStyleSel"><option value="list">List Rows (Classic)</option><option value="grid">App Grid (Phone App Boxes)</option></select></div>
-    <div class="note" style="margin-top:10px">Click your name or bio above to edit them directly.</div>
-    <h3 style="margin-top:18px">Education Roadmap</h3>
-    <div id="educationList"></div>
-    <div class="row"><label>Level</label><select id="eduLevelInput"><option>Elementary</option><option>Junior High</option><option>Senior High</option><option>College</option><option>Masteral</option><option>Doctoral</option></select></div>
-    <div class="row"><label>School/Uni</label><input type="text" id="eduSchoolInput" placeholder="School or University Name"></div>
-    <div class="row"><label>Year</label><input type="text" id="eduYearInput" placeholder="e.g. 2022 - 2026 / 3rd Year"></div>
-    <div class="row"><label>Program</label><input type="text" id="eduProgramInput" placeholder="e.g. BS Criminology / STEM"></div>
-    <div class="row"><label>Achievements</label><input type="text" id="eduAchieveInput" placeholder="Comma separated achievements"></div>
-    <button class="btn" id="addEduBtn" style="width:100%;margin-bottom:12px">Add Education Milestone</button>
-    <h3 style="margin-top:18px">Languages &amp; Hobbies (optional)</h3>
-    <div class="row"><label>Languages</label><input type="text" id="languagesInput" placeholder="e.g. English, Tagalog, Bahasa Indonesia"></div>
-    <div class="row"><label>Hobbies</label><input type="text" id="hobbiesInput" placeholder="e.g. Martial arts, Gaming, Reading"></div>
-    <h3 style="margin-top:18px">Direct Link Info</h3>
-    <div class="row"><label>Phone Number</label><input type="text" id="phoneInput" placeholder="e.g. +639123456789"></div>
-    <div class="row"><label>Email Address</label><input type="text" id="emailInput" placeholder="e.g. name@example.com"></div>
-    <h3 style="margin-top:18px">Payment QR (optional)</h3>
-    <div class="row"><label>QR Provider</label><input type="text" id="qrNameInput" placeholder="e.g. GCash / Maya"></div>
-    <div class="row"><label>QR Image</label><input type="file" id="qrFile" accept="image/*"></div>
-    <h3 style="margin-top:18px">Work Experience (optional)</h3>
-    <div id="workList"></div>
-    <div class="row"><input type="text" id="workRole" placeholder="Role / Position"><input type="text" id="workCompany" placeholder="Company"><input type="text" id="workDuration" placeholder="Duration (optional)"><button class="btn" id="addWorkBtn">Add</button></div>
-    <h3 style="margin-top:18px">Add a link</h3>
-    <div class="row"><select id="platformSel" onchange="toggleCustomLabel()"></select><input type="url" id="linkUrl" placeholder="https://wa.me/639123456789 (Use international format)"><input type="text" id="customNameInput" class="hidden" placeholder="Custom label (e.g. My Portfolio)"><button class="btn" id="addLinkBtn">Add</button></div>
-    <div class="row" style="margin-top:14px"><button class="btn" id="saveBtn">Save &amp; Publish</button><button class="btn secondary" id="doneBtn">Done editing</button></div>
-    <div id="statusEl" style="color:var(--sub)"></div>
-  </div>
+  <div class="ed hidden" id="editPanel">
+<div class="ed-head"><h2>Edit profile</h2><p>Tap a section to open it.</p></div>
+<details class="sec" open><summary><span class="ic" style="background:#ff9500"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Photos<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div class="grp">
+<div class="li"><span class="thumb" id="edAvPrev"></span><label>Profile photo</label><label class="pb">Change<input type="file" id="avatarFile" accept="image/*" hidden></label></div>
+<div class="li"><span class="thumb wide" id="edCvPrev"></span><label>Cover photo</label><label class="pb">Change<input type="file" id="coverFile" accept="image/*" hidden></label></div>
+<div class="li"><label>Cover dim</label><input type="range" id="opRange" min="0" max="90" value="55"></div></div>
+<div class="sub-t">Gallery photos (up to 3)</div>
+<div class="tiles"><label class="tile" id="tile1"><input type="file" id="photoFile1" accept="image/*" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></label><label class="tile" id="tile2"><input type="file" id="photoFile2" accept="image/*" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></label><label class="tile" id="tile3"><input type="file" id="photoFile3" accept="image/*" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></label></div></div></details>
+<details class="sec"><summary><span class="ic" style="background:#5856d6"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>Appearance<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div class="sub-t">Theme</div><div class="themes"><div class="sw" data-k="clean-light" onclick="applyThemePreset('clean-light')"><i style="background:#4472C4"></i>Clean Light</div><div class="sw" data-k="black-gray" onclick="applyThemePreset('black-gray')"><i style="background:linear-gradient(135deg,#242424,#0d0d0d)"></i>Black & Gray</div><div class="sw" data-k="white-pink" onclick="applyThemePreset('white-pink')"><i style="background:linear-gradient(135deg,#ff80bf,#ffb3d9)"></i>White & Pink</div><div class="sw" data-k="white-black" onclick="applyThemePreset('white-black')"><i style="background:linear-gradient(135deg,#334155,#0f172a)"></i>White & Black</div><div class="sw" data-k="lgbt-pride" onclick="applyThemePreset('lgbt-pride')"><i style="background:linear-gradient(90deg,red,orange,yellow,green,blue,purple)"></i>Pride</div><div class="sw" data-k="midnight-blue" onclick="applyThemePreset('midnight-blue')"><i style="background:linear-gradient(135deg,#1e40af,#1e1b4b)"></i>Midnight</div><div class="sw" data-k="emerald-dark" onclick="applyThemePreset('emerald-dark')"><i style="background:linear-gradient(135deg,#047857,#064e3b)"></i>Emerald</div><div class="sw" data-k="sunset-amber" onclick="applyThemePreset('sunset-amber')"><i style="background:linear-gradient(135deg,#d97706,#b45309)"></i>Sunset</div></div>
+<div class="sub-t">Links layout</div>
+<div class="seg" data-for="layoutStyleSel"><button data-v="list">List</button><button data-v="grid">App grid</button></div>
+<select id="layoutStyleSel" class="hidden"><option value="list">List</option><option value="grid">Grid</option></select>
+<div class="sub-t">Icon colors</div>
+<div class="seg" data-for="iconStyleSel"><button data-v="brand">Brand colors</button><button data-v="match">Match theme</button></div>
+<select id="iconStyleSel" class="hidden"><option value="brand">Brand</option><option value="match">Match</option></select>
+<div class="grp"><div class="li"><label for="showTapsSw" style="flex:1">Show taps counter</label><label class="switch"><input type="checkbox" id="showTapsSw"><span class="slider"></span></label></div></div>
+<div class="note">When off, the taps pill is hidden and Gallery shows its full label. Taps are still counted.</div></div></details>
+<details class="sec"><summary><span class="ic" style="background:#34c759"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>About you<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div class="note" style="margin:0">Tap your name or bio at the top of the page to edit them directly.</div><div class="grp"><div class="li"><label>Location</label><input type="text" id="workCityCountry" placeholder="City, Country" ></div><div class="li"><label>Languages</label><input type="text" id="languagesInput" placeholder="English, Tagalog" ></div><div class="li"><label>Hobbies</label><input type="text" id="hobbiesInput" placeholder="Gaming, Reading" ></div></div></div></details>
+<details class="sec"><summary><span class="ic" style="background:#30b0c7"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>Contact & payment<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div class="grp"><div class="li"><label>Phone</label><input type="text" id="phoneInput" placeholder="+639123456789" inputmode="tel"></div><div class="li"><label>Email</label><input type="text" id="emailInput" placeholder="name@example.com" inputmode="email"></div><div class="li"><label>QR name</label><input type="text" id="qrNameInput" placeholder="GCash / Maya" ></div><div class="li"><label>QR image</label><label class="pb">Upload<input type="file" id="qrFile" accept="image/*" hidden></label></div></div></div></details>
+<details class="sec"><summary><span class="ic" style="background:#af52de"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>Education<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div id="educationList"></div><div class="grp"><div class="li"><label>Level</label><select id="eduLevelInput"><option>Elementary</option><option>Junior High</option><option>Senior High</option><option>College</option><option>Masteral</option><option>Doctoral</option></select></div><div class="li"><label>School</label><input type="text" id="eduSchoolInput" placeholder="School or university" ></div><div class="li"><label>Year</label><input type="text" id="eduYearInput" placeholder="2022 - 2026" ></div><div class="li"><label>Program</label><input type="text" id="eduProgramInput" placeholder="BS Criminology / STEM" ></div><div class="li"><label>Awards</label><input type="text" id="eduAchieveInput" placeholder="Comma separated" ></div></div><button class="btn" id="addEduBtn">Add education</button></div></details>
+<details class="sec"><summary><span class="ic" style="background:#ff6b35"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>Work experience<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div id="workList"></div><div class="grp"><div class="li"><label>Role</label><input type="text" id="workRole" placeholder="Role / position" ></div><div class="li"><label>Company</label><input type="text" id="workCompany" placeholder="Company" ></div><div class="li"><label>Duration</label><input type="text" id="workDuration" placeholder="Optional" ></div></div><button class="btn" id="addWorkBtn">Add experience</button></div></details>
+<details class="sec"><summary><span class="ic" style="background:#007aff"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Add a link<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="sec-body"><div class="grp"><div class="li"><label>Platform</label><select id="platformSel" onchange="toggleCustomLabel()"></select></div><div class="li"><label>Link</label><input type="url" id="linkUrl" placeholder="https://..." autocapitalize="off"></div><div class="li"><label>Label</label><input type="text" id="customNameInput" placeholder="e.g. My Portfolio"></div></div><button class="btn" id="addLinkBtn">Add link</button><div class="note">Tap the × on a link above to remove it.</div></div></details>
+<div class="actionbar"><div id="statusEl"></div><div class="arow"><button class="btn secondary" id="doneBtn">Done</button><button class="btn" id="saveBtn">Save &amp; publish</button></div></div>
+</div>
 
-  <div class="panel hidden" id="inboxPanel">
+<div class="panel hidden" id="inboxPanel">
     <h3><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Visitor Notes Inbox</h3>
     <div id="notesListContainer" style="font-size:13px;color:var(--sub)">No notes yet.</div>
     <button class="btn secondary" id="closeInboxBtn" style="margin-top:12px">Close Inbox</button>
@@ -598,7 +614,7 @@ function downloadVCard(){
 function applyThemePreset(key){state.themeKey=key;localStorage.setItem('lynq_theme_key',key);render()}
 function toggleCustomLabel(){
   const sel=$('platformSel').value,ci=$('customNameInput'),lu=$('linkUrl');
-  if(sel==='website')ci.classList.remove('hidden');else{ci.classList.add('hidden');ci.value=''}
+  ci.parentElement.classList.toggle('hidden',sel!=='website');if(sel!=='website')ci.value=''
   if(sel==='whatsapp'){lu.value='https://wa.me/';lu.placeholder='https://wa.me/639123456789 (Use international format)'}
   else{if(lu.value==='https://wa.me/')lu.value='';lu.placeholder='https:// or phone / email'}
 }
@@ -715,9 +731,14 @@ function render(){
   });
 
   $('nameEl').contentEditable=editing;$('bioEl').contentEditable=editing;
-  $('editPanel').classList.toggle('hidden',!editing);
+  $('editPanel').classList.toggle('hidden',!editing);document.body.classList.toggle('editing',editing);
+  $('edAvPrev').style.backgroundImage=state.avatar?`url(${state.avatar})`:'';
+  $('edCvPrev').style.backgroundImage=state.cover?`url(${state.cover})`:t.cover;
+  [0,1,2].forEach(i=>{const el=$('tile'+(i+1)),ph=(state.photos||[])[i];el.style.backgroundImage=ph?`url(${ph})`:'';el.classList.toggle('has',!!ph)});
+  document.querySelectorAll('.sw').forEach(e=>e.classList.toggle('on',e.dataset.k===(state.themeKey||'clean-light')));
   $('opRange').value=Math.round((state.coverOpacity??.55)*100);
   $('layoutStyleSel').value=state.layoutStyle||'list';$('iconStyleSel').value=state.iconStyle||'brand';
+  document.querySelectorAll('.seg').forEach(g=>{const v=$(g.dataset.for).value;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))});
   [['workCityCountry','workCityCountry'],['languagesInput','languages'],['hobbiesInput','hobbies'],['phoneInput','phone'],['emailInput','email'],['qrNameInput','qrName']].forEach(([id,k])=>{if(document.activeElement!==$(id))$(id).value=state[k]||''});
   hideLoader();
 }
@@ -766,6 +787,20 @@ function successScreen(){
   <button class="gbtn primary" id="editYourCard" style="margin-top:10px">Edit your card</button>`);
   $('editYourCard').onclick=()=>wiz(0);
 }
+const HINTS={
+ instagram:'Open Instagram, go to your profile, tap Share profile, then Copy link.',
+ facebook:'Open your Facebook profile, tap the three dots (⋯), then Copy link to profile.',
+ whatsapp:'Use https://wa.me/ followed by your number with country code, no + or spaces. Example: https://wa.me/639123456789',
+ messenger:'Use https://m.me/ followed by your Facebook username. Example: https://m.me/yourname',
+ viber:'Open Viber, go to your profile, and copy your profile link to paste here.',
+ telegram:'Use https://t.me/ followed by your Telegram username. Example: https://t.me/yourname',
+ twitter:'Open your profile on X, tap the share icon, then Copy link.',
+ tiktok:'Open your TikTok profile, tap the share icon, then Copy link.',
+ youtube:'Open your YouTube channel, tap More (⋯), then Share and Copy link.',
+ linkedin:'Open your LinkedIn profile, tap More (⋯), then copy your profile link.',
+ website:'Open your website in a browser and copy the address from the top bar.',
+ github:'Use https://github.com/ followed by your username. Example: https://github.com/yourname'
+};
 const WS=[
  {k:'avatar',t:'Add your profile photo',s:'Choose a photo, then drag and pinch to fit it.'},
  {k:'cover',t:'Add a cover photo',s:'It sits behind your profile. Drag and pinch to frame it.'},
@@ -782,7 +817,7 @@ function wiz(i){
   if(k==='name')b=`<input class="gfield" id="wName" maxlength="40" placeholder="Your full name" value="${state.name==='Your Name'?'':esc(state.name)}" autocomplete="name">`;
   if(k==='bio')b=`<textarea class="gfield" id="wBio" maxlength="220" placeholder="Tell people who you are...">${state.bio===DEFAULT_STATE.bio?'':esc(state.bio)}</textarea>`;
   if(k==='contact')b=`<input class="gfield" id="wPhone" type="tel" placeholder="Phone e.g. +639123456789" value="${esc(state.phone)}"><input class="gfield" id="wEmail" type="email" placeholder="Email address" value="${esc(state.email)}"><input class="gfield" id="wCity" placeholder="City, Country e.g. Davao City, Philippines" value="${esc(state.workCityCountry)}">`;
-  if(k==='link')b=`<select class="gfield" id="wPlat">${Object.entries(ICONS).map(([a,v])=>`<option value="${a}">${v.label}</option>`).join('')}</select><input class="gfield" id="wUrl" type="url" placeholder="https://...">`;
+  if(k==='link')b=`<div class="fgrp"><select class="gfield sm" id="wPlat">${Object.entries(ICONS).map(([a,v])=>`<option value="${a}">${v.label}</option>`).join('')}</select><input class="gfield sm" id="wUrl" type="url" placeholder="Paste your link here" autocapitalize="off" autocorrect="off"><p class="hint" id="wHint"></p></div>`;
   const label=isImg&&!state[k]?'Choose photo':(i===WS.length-1?'Finish':'Continue');
   flowShow(`<div class="dots">${WS.map((_,j)=>`<i class="${j<=i?'on':''}"></i>`).join('')}</div><h2>${w.t}</h2><p>${w.s}</p>${b}<button class="gbtn primary" id="wNext" style="margin-top:6px">${label}</button><button class="ghost" id="wSkip">Set up later</button>`);
   if(isImg){const again=()=>pick(k,u=>{state[k]=u;wiz(i)});$('pv').onclick=again;
@@ -794,7 +829,7 @@ function wiz(i){
     if(k==='link'){const u=$('wUrl').value.trim();if(u)state.links.push({platform:$('wPlat').value,url:u,customName:''})}
     persist();wiz(i+1)};
   $('wSkip').onclick=()=>wiz(i+1);
-  const wp=$('wPlat');if(wp)wp.onchange=()=>{const u=$('wUrl');if(wp.value==='whatsapp')u.value='https://wa.me/';else if(u.value==='https://wa.me/')u.value=''};
+  const wp=$('wPlat');if(wp){const hint=()=>{$('wHint').textContent=HINTS[wp.value]||''};hint();wp.onchange=()=>{const u=$('wUrl');if(wp.value==='whatsapp')u.value='https://wa.me/';else if(u.value==='https://wa.me/')u.value='';hint()}}
 }
 async function wizDone(){
   await persist();
@@ -875,6 +910,7 @@ async function init(){
   $('nameEl').addEventListener('input',e=>state.name=e.target.textContent);
   $('bioEl').addEventListener('input',e=>state.bio=e.target.textContent);
   $('opRange').addEventListener('input',e=>{state.coverOpacity=e.target.value/100;render()});
+  document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{const sel=$(b.parentElement.dataset.for);sel.value=b.dataset.v;sel.dispatchEvent(new Event('change'))}));
   $('showTapsSw').addEventListener('change',e=>{state.showTaps=e.target.checked;render()});
   $('layoutStyleSel').addEventListener('change',e=>{state.layoutStyle=e.target.value;render()});
   $('iconStyleSel').addEventListener('change',e=>{state.iconStyle=e.target.value;render()});
