@@ -676,7 +676,7 @@ async function handleNfcCardBinding(){
   tapCount=+rec.tap_count||0;
   if(!isOwner&&!sessionStorage.getItem('tap_'+uid)){
     sessionStorage.setItem('tap_'+uid,'1');
-    try{const{data,error:te}=await supabaseClient.rpc('increment_tap',{p_uid:uid});if(!te&&typeof data==='number')tapCount=data}catch(_e){}
+    try{const{data,error:te}=await supabaseClient.rpc('increment_tap',{p_uid:uid});if(te)console.warn('LYNQ tap counter:',te.message);else if(typeof data==='number')tapCount=data;else tapCount+=1}catch(e){console.warn('LYNQ tap counter:',e)}
   }
   render();
   if(justClaimed){successScreen();if(window._inherited)$('editYourCard').onclick=()=>{flowClose();editing=true;render()}}
